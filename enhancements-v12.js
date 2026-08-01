@@ -207,7 +207,7 @@
     library.dataset.supabaseLibrary = 'true';
     library.onload = () => {
       const integration = document.createElement('script');
-      integration.src = './supabase-v14.js?v=14';
+      integration.src = './supabase-v14.js?v=16';
       integration.dataset.supabaseIntegration = 'true';
       document.head.appendChild(integration);
     };
