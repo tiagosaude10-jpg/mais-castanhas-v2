@@ -172,11 +172,13 @@
     if (!email) return;
 
     try {
+      localStorage.setItem('maisCastanhas.passwordRecoveryPending', 'true');
       const redirectTo = `${location.origin}${location.pathname}`;
       const { error } = await client.auth.resetPasswordForEmail(email.trim(), { redirectTo });
       if (error) throw error;
       showToast('Enviamos as instruções de recuperação para o e-mail informado.');
     } catch (error) {
+      localStorage.removeItem('maisCastanhas.passwordRecoveryPending');
       showToast(`Não foi possível solicitar a recuperação: ${error.message || 'erro desconhecido'}`);
     }
   }
@@ -188,7 +190,7 @@
     overlay.id = 'maisCastanhasPasswordReset';
     overlay.innerHTML = `
       <div style="position:fixed;inset:0;z-index:99999;background:#FDE3C5;display:grid;place-items:center;padding:24px;box-sizing:border-box;">
-        <form id="maisCastanhasPasswordResetForm" style="width:min(100%,430px);background:#fff;padding:26px;border-radius:24px;box-shadow:0 18px 55px rgba(45,70,43,.18);">
+        <form id="maisCastanhasPasswordResetForm" style="width:min(100%,430px);background:#fff;padding:26px;border-radius:24px;box-sizing:border-box;box-shadow:0 18px 55px rgba(45,70,43,.18);">
           <h2 style="margin:0 0 8px;color:#2f6535;text-align:center;">Criar nova senha</h2>
           <p style="margin:0 0 22px;color:#687169;text-align:center;line-height:1.45;">Digite uma nova senha para sua conta do Mais Castanhas.</p>
           <label style="display:block;margin-bottom:8px;font-weight:800;color:#344038;">Nova senha</label>
@@ -229,6 +231,7 @@
         return;
       }
 
+      localStorage.removeItem('maisCastanhas.passwordRecoveryPending');
       message.style.color = '#2f6535';
       message.textContent = 'Senha alterada com sucesso. Você já pode entrar.';
       setTimeout(async () => {
@@ -241,17 +244,38 @@
     });
   }
 
-  function bindRecoveryDetection() {
+  async function bindRecoveryDetection() {
     if (!client) return;
+
+    const params = new URLSearchParams(location.search);
+    const hash = new URLSearchParams(location.hash.replace(/^#/, ''));
+    const code = params.get('code');
+    const type = params.get('type') || hash.get('type');
+    const pending = localStorage.getItem('maisCastanhas.passwordRecoveryPending') === 'true';
+
     client.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') showPasswordResetScreen();
     });
 
-    const params = new URLSearchParams(location.search);
-    const hash = new URLSearchParams(location.hash.replace(/^#/, ''));
-    if (params.get('type') === 'recovery' || hash.get('type') === 'recovery') {
-      setTimeout(showPasswordResetScreen, 250);
+    if (type === 'recovery') {
+      setTimeout(showPasswordResetScreen, 150);
+      return;
     }
+
+    if (code) {
+      try {
+        const { error } = await client.auth.exchangeCodeForSession(code);
+        if (error) throw error;
+        history.replaceState({}, document.title, location.pathname);
+        showPasswordResetScreen();
+        return;
+      } catch (error) {
+        console.error('Falha ao validar o link de recuperação:', error);
+      }
+    }
+
+    const { data } = await client.auth.getSession();
+    if (pending && data?.session) showPasswordResetScreen();
   }
 
   function bindRegistration() {
