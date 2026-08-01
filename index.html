@@ -4,68 +4,68 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#24552a">
-  <meta name="description" content="Tela de entrada e primeiro cadastro do Mais Castanhas.">
-  <title>Mais Castanhas — Acesso</title>
+  <meta name="description" content="Entrada e primeiro cadastro do aplicativo Mais Castanhas.">
+  <meta name="format-detection" content="telephone=no">
 
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
-  <link rel="apple-touch-icon" href="assets/icon-192.png">
-  <link rel="stylesheet" href="styles.css">
+  <title>Mais Castanhas — Entrada e cadastro</title>
+
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <link rel="stylesheet" href="./styles.css">
 </head>
 
 <body>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <main class="auth-page">
-    <section class="brand-panel" aria-label="Apresentação do Mais Castanhas">
+  <main class="auth-layout">
+    <aside class="brand-panel" aria-label="Apresentação do Mais Castanhas">
       <div class="brand-panel__content">
         <img
           class="brand-logo"
-          src="assets/logo-mais-castanhas.png"
+          src="./logo-mais-castanhas.png"
           alt="Mais Castanhas — Conexão que gera valor"
-          width="430"
-          height="323"
+          width="1100"
+          height="825"
         >
 
         <div class="brand-copy">
-          <span class="eyebrow">Gestão integrada</span>
-          <h1>Controle, segurança e decisões melhores para o seu negócio.</h1>
+          <p class="eyebrow eyebrow--light">Gestão integrada</p>
+          <h1>Seu negócio organizado, seguro e acessível.</h1>
           <p>
-            Acesse sua operação em qualquer dispositivo. Novos cadastros ficam
-            pendentes até a aprovação de um administrador.
+            Uma nova estrutura para acompanhar a operação da castanha pelo celular,
+            computador ou tablet.
           </p>
         </div>
 
-        <ul class="benefits" aria-label="Benefícios">
-          <li><span aria-hidden="true">✓</span> Acesso protegido por usuário</li>
-          <li><span aria-hidden="true">✓</span> Permissões e aprovação administrativa</li>
-          <li><span aria-hidden="true">✓</span> Preparado para Android, iPhone e computador</li>
+        <ul class="benefits">
+          <li><span aria-hidden="true">✓</span> Acesso individual e protegido</li>
+          <li><span aria-hidden="true">✓</span> Perfis e permissões administrativas</li>
+          <li><span aria-hidden="true">✓</span> Dados preparados para sincronização online</li>
         </ul>
       </div>
 
       <p class="brand-footer">Mais Castanhas • Conexão que gera valor</p>
-    </section>
+    </aside>
 
     <section class="auth-panel">
-      <div class="mobile-brand">
+      <header class="mobile-brand">
         <img
-          src="assets/logo-mais-castanhas.png"
+          src="./logo-mais-castanhas.png"
           alt="Mais Castanhas"
-          width="300"
-          height="225"
+          width="1100"
+          height="825"
         >
-      </div>
+      </header>
 
       <div class="auth-card">
-        <div class="auth-card__header">
-          <p class="eyebrow">Bem-vindo</p>
+        <header class="auth-card__header">
+          <p class="eyebrow">Área de acesso</p>
           <h2 id="panelTitle">Entre na sua conta</h2>
-          <p id="panelDescription">
-            Informe seus dados de acesso para continuar.
-          </p>
-        </div>
+          <p id="panelDescription">Informe seus dados para continuar.</p>
+        </header>
 
-        <div class="auth-tabs" role="tablist" aria-label="Acesso ao sistema">
+        <div class="auth-tabs" role="tablist" aria-label="Escolha entre entrada e cadastro">
           <button
             id="loginTab"
             class="auth-tab active"
@@ -99,7 +99,6 @@
             <div class="field">
               <label for="loginUser">E-mail ou CPF</label>
               <div class="input-wrap">
-                <span class="input-icon" aria-hidden="true">●</span>
                 <input
                   id="loginUser"
                   name="loginUser"
@@ -115,21 +114,20 @@
             <div class="field">
               <div class="label-row">
                 <label for="loginPassword">Senha</label>
-                <button class="text-button" type="button" id="forgotPassword">
+                <button id="forgotPassword" class="text-button" type="button">
                   Esqueci minha senha
                 </button>
               </div>
 
               <div class="input-wrap">
-                <span class="input-icon" aria-hidden="true">◆</span>
                 <input
                   id="loginPassword"
                   name="loginPassword"
                   type="password"
                   autocomplete="current-password"
                   placeholder="Digite sua senha"
-                  required
                   minlength="8"
+                  required
                 >
                 <button
                   class="password-toggle"
@@ -152,8 +150,8 @@
               Entrar no aplicativo
             </button>
 
-            <p class="approval-note">
-              Seu acesso somente será liberado depois da aprovação de um administrador.
+            <p class="info-note">
+              A autenticação será ativada quando o banco de dados for conectado.
             </p>
           </form>
         </section>
@@ -165,159 +163,341 @@
           aria-labelledby="registerTab"
           hidden
         >
-          <div class="step-line" aria-label="Etapa atual">
-            <span>Etapa 1 de 3</span>
-            <div class="step-track"><span></span></div>
+          <div id="registrationContent">
+            <div class="stepper" aria-label="Progresso do cadastro">
+              <div class="stepper__top">
+                <strong id="stepLabel">Etapa 1 de 3</strong>
+                <span id="stepName">Responsável</span>
+              </div>
+              <div class="step-track" aria-hidden="true">
+                <span id="stepProgress"></span>
+              </div>
+              <ol class="step-dots">
+                <li class="active" data-step-dot="1">Responsável</li>
+                <li data-step-dot="2">Empresa</li>
+                <li data-step-dot="3">Revisão</li>
+              </ol>
+            </div>
+
+            <form id="registerForm" novalidate>
+              <section class="form-step active" data-step="1">
+                <div class="section-heading">
+                  <h3>Dados do responsável</h3>
+                  <p>Este usuário será o proprietário e administrador inicial.</p>
+                </div>
+
+                <div class="field">
+                  <label for="fullName">Nome completo</label>
+                  <div class="input-wrap">
+                    <input
+                      id="fullName"
+                      name="fullName"
+                      type="text"
+                      autocomplete="name"
+                      placeholder="Digite nome e sobrenome"
+                      minlength="5"
+                      required
+                    >
+                  </div>
+                  <small class="field-error" data-error-for="fullName"></small>
+                </div>
+
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="cpf">CPF</label>
+                    <div class="input-wrap">
+                      <input
+                        id="cpf"
+                        name="cpf"
+                        type="text"
+                        inputmode="numeric"
+                        placeholder="000.000.000-00"
+                        maxlength="14"
+                        required
+                      >
+                    </div>
+                    <small class="field-error" data-error-for="cpf"></small>
+                  </div>
+
+                  <div class="field">
+                    <label for="phone">Telefone/WhatsApp</label>
+                    <div class="input-wrap">
+                      <input
+                        id="phone"
+                        name="phone"
+                        type="tel"
+                        inputmode="tel"
+                        autocomplete="tel"
+                        placeholder="(00) 00000-0000"
+                        maxlength="15"
+                        required
+                      >
+                    </div>
+                    <small class="field-error" data-error-for="phone"></small>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label for="email">E-mail</label>
+                  <div class="input-wrap">
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      autocomplete="email"
+                      placeholder="seuemail@exemplo.com"
+                      required
+                    >
+                  </div>
+                  <small class="field-error" data-error-for="email"></small>
+                </div>
+
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="password">Criar senha</label>
+                    <div class="input-wrap">
+                      <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        autocomplete="new-password"
+                        placeholder="Mínimo de 8 caracteres"
+                        minlength="8"
+                        required
+                      >
+                      <button
+                        class="password-toggle"
+                        type="button"
+                        data-toggle-password="password"
+                        aria-label="Mostrar senha"
+                      >
+                        Mostrar
+                      </button>
+                    </div>
+                    <small class="field-error" data-error-for="password"></small>
+                  </div>
+
+                  <div class="field">
+                    <label for="passwordConfirm">Confirmar senha</label>
+                    <div class="input-wrap">
+                      <input
+                        id="passwordConfirm"
+                        name="passwordConfirm"
+                        type="password"
+                        autocomplete="new-password"
+                        placeholder="Repita a senha"
+                        minlength="8"
+                        required
+                      >
+                      <button
+                        class="password-toggle"
+                        type="button"
+                        data-toggle-password="passwordConfirm"
+                        aria-label="Mostrar senha"
+                      >
+                        Mostrar
+                      </button>
+                    </div>
+                    <small class="field-error" data-error-for="passwordConfirm"></small>
+                  </div>
+                </div>
+
+                <div class="password-strength" aria-live="polite">
+                  <div class="strength-track"><span id="strengthBar"></span></div>
+                  <small id="strengthText">Use 8 caracteres, com letra e número.</small>
+                </div>
+              </section>
+
+              <section class="form-step" data-step="2" hidden>
+                <div class="section-heading">
+                  <h3>Dados da empresa ou operação</h3>
+                  <p>Esses dados formarão o ambiente principal do sistema.</p>
+                </div>
+
+                <div class="field">
+                  <label for="companyName">Nome da empresa ou operação</label>
+                  <div class="input-wrap">
+                    <input
+                      id="companyName"
+                      name="companyName"
+                      type="text"
+                      autocomplete="organization"
+                      placeholder="Ex.: Comércio de Castanhas do Hélio"
+                      minlength="3"
+                      required
+                    >
+                  </div>
+                  <small class="field-error" data-error-for="companyName"></small>
+                </div>
+
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="tradeName">Nome fantasia <span class="optional">(opcional)</span></label>
+                    <div class="input-wrap">
+                      <input
+                        id="tradeName"
+                        name="tradeName"
+                        type="text"
+                        placeholder="Nome conhecido comercialmente"
+                      >
+                    </div>
+                    <small class="field-error" data-error-for="tradeName"></small>
+                  </div>
+
+                  <div class="field">
+                    <label for="companyDocument">CPF ou CNPJ <span class="optional">(opcional)</span></label>
+                    <div class="input-wrap">
+                      <input
+                        id="companyDocument"
+                        name="companyDocument"
+                        type="text"
+                        inputmode="numeric"
+                        placeholder="CPF ou CNPJ"
+                        maxlength="18"
+                      >
+                    </div>
+                    <small class="field-error" data-error-for="companyDocument"></small>
+                  </div>
+                </div>
+
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="city">Cidade</label>
+                    <div class="input-wrap">
+                      <input
+                        id="city"
+                        name="city"
+                        type="text"
+                        autocomplete="address-level2"
+                        placeholder="Digite a cidade"
+                        required
+                      >
+                    </div>
+                    <small class="field-error" data-error-for="city"></small>
+                  </div>
+
+                  <div class="field">
+                    <label for="state">Estado</label>
+                    <div class="input-wrap select-wrap">
+                      <select id="state" name="state" autocomplete="address-level1" required>
+                        <option value="">Selecione</option>
+                        <option value="AC">Acre</option>
+                        <option value="AL">Alagoas</option>
+                        <option value="AP">Amapá</option>
+                        <option value="AM">Amazonas</option>
+                        <option value="BA">Bahia</option>
+                        <option value="CE">Ceará</option>
+                        <option value="DF">Distrito Federal</option>
+                        <option value="ES">Espírito Santo</option>
+                        <option value="GO">Goiás</option>
+                        <option value="MA">Maranhão</option>
+                        <option value="MT">Mato Grosso</option>
+                        <option value="MS">Mato Grosso do Sul</option>
+                        <option value="MG">Minas Gerais</option>
+                        <option value="PA">Pará</option>
+                        <option value="PB">Paraíba</option>
+                        <option value="PR">Paraná</option>
+                        <option value="PE">Pernambuco</option>
+                        <option value="PI">Piauí</option>
+                        <option value="RJ">Rio de Janeiro</option>
+                        <option value="RN">Rio Grande do Norte</option>
+                        <option value="RS">Rio Grande do Sul</option>
+                        <option value="RO">Rondônia</option>
+                        <option value="RR">Roraima</option>
+                        <option value="SC">Santa Catarina</option>
+                        <option value="SP">São Paulo</option>
+                        <option value="SE">Sergipe</option>
+                        <option value="TO">Tocantins</option>
+                      </select>
+                    </div>
+                    <small class="field-error" data-error-for="state"></small>
+                  </div>
+                </div>
+
+                <div class="role-card">
+                  <div class="role-card__icon" aria-hidden="true">A</div>
+                  <div>
+                    <strong>Perfil inicial</strong>
+                    <p>Proprietário e administrador, com acesso completo à empresa cadastrada.</p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="form-step" data-step="3" hidden>
+                <div class="section-heading">
+                  <h3>Revise antes de concluir</h3>
+                  <p>Confirme os dados principais do primeiro cadastro.</p>
+                </div>
+
+                <div class="review-card">
+                  <div class="review-group">
+                    <span>Responsável</span>
+                    <strong id="reviewName">—</strong>
+                    <small id="reviewContact">—</small>
+                  </div>
+
+                  <div class="review-group">
+                    <span>Empresa ou operação</span>
+                    <strong id="reviewCompany">—</strong>
+                    <small id="reviewLocation">—</small>
+                  </div>
+
+                  <div class="review-group">
+                    <span>Perfil de acesso</span>
+                    <strong>Proprietário e administrador inicial</strong>
+                    <small>Acesso completo após a ativação da autenticação.</small>
+                  </div>
+                </div>
+
+                <div class="terms-box">
+                  <label class="check-row">
+                    <input id="terms" name="terms" type="checkbox" required>
+                    <span>
+                      Declaro que as informações são verdadeiras e aceito os
+                      <button type="button" class="inline-link" data-modal="termsModal">termos de uso</button>
+                      e a
+                      <button type="button" class="inline-link" data-modal="privacyModal">política de privacidade</button>.
+                    </span>
+                  </label>
+                  <small class="field-error standalone" data-error-for="terms"></small>
+                </div>
+
+                <p class="info-note">
+                  Nesta etapa do projeto, o formulário é validado no aparelho, mas ainda
+                  não envia nem armazena dados.
+                </p>
+              </section>
+
+              <div class="form-actions">
+                <button id="backStep" class="secondary-button" type="button" hidden>
+                  Voltar
+                </button>
+                <button id="nextStep" class="primary-button primary-button--compact" type="button">
+                  Continuar
+                </button>
+                <button id="submitRegistration" class="primary-button primary-button--compact" type="submit" hidden>
+                  Concluir cadastro
+                </button>
+              </div>
+            </form>
           </div>
 
-          <form id="registerForm" novalidate>
-            <div class="field">
-              <label for="fullName">Nome completo</label>
-              <div class="input-wrap">
-                <span class="input-icon" aria-hidden="true">●</span>
-                <input
-                  id="fullName"
-                  name="fullName"
-                  type="text"
-                  autocomplete="name"
-                  placeholder="Digite seu nome completo"
-                  required
-                  minlength="5"
-                >
-              </div>
-              <small class="field-error" data-error-for="fullName"></small>
-            </div>
-
-            <div class="form-grid">
-              <div class="field">
-                <label for="cpf">CPF</label>
-                <div class="input-wrap">
-                  <input
-                    id="cpf"
-                    name="cpf"
-                    type="text"
-                    inputmode="numeric"
-                    autocomplete="off"
-                    placeholder="000.000.000-00"
-                    maxlength="14"
-                    required
-                  >
-                </div>
-                <small class="field-error" data-error-for="cpf"></small>
-              </div>
-
-              <div class="field">
-                <label for="phone">Telefone/WhatsApp</label>
-                <div class="input-wrap">
-                  <input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    inputmode="tel"
-                    autocomplete="tel"
-                    placeholder="(00) 00000-0000"
-                    maxlength="15"
-                    required
-                  >
-                </div>
-                <small class="field-error" data-error-for="phone"></small>
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="email">E-mail</label>
-              <div class="input-wrap">
-                <span class="input-icon" aria-hidden="true">@</span>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autocomplete="email"
-                  placeholder="seuemail@exemplo.com"
-                  required
-                >
-              </div>
-              <small class="field-error" data-error-for="email"></small>
-            </div>
-
-            <div class="form-grid">
-              <div class="field">
-                <label for="password">Criar senha</label>
-                <div class="input-wrap">
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autocomplete="new-password"
-                    placeholder="Mínimo de 8 caracteres"
-                    minlength="8"
-                    required
-                  >
-                  <button
-                    class="password-toggle"
-                    type="button"
-                    data-toggle-password="password"
-                    aria-label="Mostrar senha"
-                  >
-                    Mostrar
-                  </button>
-                </div>
-                <small class="field-error" data-error-for="password"></small>
-              </div>
-
-              <div class="field">
-                <label for="passwordConfirm">Confirmar senha</label>
-                <div class="input-wrap">
-                  <input
-                    id="passwordConfirm"
-                    name="passwordConfirm"
-                    type="password"
-                    autocomplete="new-password"
-                    placeholder="Repita sua senha"
-                    minlength="8"
-                    required
-                  >
-                  <button
-                    class="password-toggle"
-                    type="button"
-                    data-toggle-password="passwordConfirm"
-                    aria-label="Mostrar senha"
-                  >
-                    Mostrar
-                  </button>
-                </div>
-                <small class="field-error" data-error-for="passwordConfirm"></small>
-              </div>
-            </div>
-
-            <div class="password-strength" aria-live="polite">
-              <div class="strength-track"><span id="strengthBar"></span></div>
-              <small id="strengthText">Use 8 caracteres, letra e número.</small>
-            </div>
-
-            <label class="check-row terms-row">
-              <input id="terms" name="terms" type="checkbox" required>
-              <span>
-                Declaro que as informações são verdadeiras e aceito os
-                <button type="button" class="inline-link" data-modal="termsModal">termos de uso</button>
-                e a
-                <button type="button" class="inline-link" data-modal="privacyModal">política de privacidade</button>.
-              </span>
-            </label>
-            <small class="field-error standalone" data-error-for="terms"></small>
-
-            <button class="primary-button" type="submit">
-              Continuar cadastro
-            </button>
-
-            <p class="approval-note">
-              Depois de concluído, o pedido será enviado para aprovação administrativa.
+          <section id="registrationSuccess" class="success-state" hidden>
+            <div class="success-state__icon" aria-hidden="true">✓</div>
+            <p class="eyebrow">Cadastro validado</p>
+            <h3>Estrutura inicial concluída</h3>
+            <p>
+              Os dados foram validados no aparelho. O envio definitivo será ativado
+              quando conectarmos a autenticação e o banco de dados.
             </p>
-          </form>
+            <button id="newRegistration" class="secondary-button" type="button">
+              Fazer novo cadastro
+            </button>
+          </section>
         </section>
       </div>
 
-      <p class="page-footer">© 2026 Mais Castanhas. Todos os direitos reservados.</p>
+      <footer class="page-footer">© 2026 Mais Castanhas. Todos os direitos reservados.</footer>
     </section>
   </main>
 
@@ -330,6 +510,6 @@
     </div>
   </dialog>
 
-  <script src="app.js" defer></script>
+  <script src="./app.js" defer></script>
 </body>
 </html>
