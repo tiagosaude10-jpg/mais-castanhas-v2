@@ -14,7 +14,6 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
   <link rel="stylesheet" href="./styles.css">
 </head>
-
 <body>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
@@ -33,15 +32,15 @@
           <p class="eyebrow eyebrow--light">Gestão integrada</p>
           <h1>Seu negócio organizado, seguro e acessível.</h1>
           <p>
-            Uma nova estrutura para acompanhar a operação da castanha pelo celular,
-            computador ou tablet.
+            Cadastre sua operação em nome próprio ou como empresa e prepare o
+            primeiro acesso administrativo do sistema.
           </p>
         </div>
 
         <ul class="benefits">
-          <li><span aria-hidden="true">✓</span> Acesso individual e protegido</li>
-          <li><span aria-hidden="true">✓</span> Perfis e permissões administrativas</li>
-          <li><span aria-hidden="true">✓</span> Dados preparados para sincronização online</li>
+          <li><span aria-hidden="true">✓</span> Cadastro separado para pessoa física e jurídica</li>
+          <li><span aria-hidden="true">✓</span> Primeiro usuário com perfil administrativo</li>
+          <li><span aria-hidden="true">✓</span> Estrutura preparada para sincronização online</li>
         </ul>
       </div>
 
@@ -50,12 +49,7 @@
 
     <section class="auth-panel">
       <header class="mobile-brand">
-        <img
-          src="./logo-mais-castanhas.png"
-          alt="Mais Castanhas"
-          width="1100"
-          height="825"
-        >
+        <img src="./logo-mais-castanhas.png" alt="Mais Castanhas" width="1100" height="825">
       </header>
 
       <div class="auth-card">
@@ -66,47 +60,21 @@
         </header>
 
         <div class="auth-tabs" role="tablist" aria-label="Escolha entre entrada e cadastro">
-          <button
-            id="loginTab"
-            class="auth-tab active"
-            type="button"
-            role="tab"
-            aria-selected="true"
-            aria-controls="loginPanel"
-          >
+          <button id="loginTab" class="auth-tab active" type="button" role="tab" aria-selected="true" aria-controls="loginPanel">
             Entrar
           </button>
-
-          <button
-            id="registerTab"
-            class="auth-tab"
-            type="button"
-            role="tab"
-            aria-selected="false"
-            aria-controls="registerPanel"
-          >
+          <button id="registerTab" class="auth-tab" type="button" role="tab" aria-selected="false" aria-controls="registerPanel">
             Primeiro cadastro
           </button>
         </div>
 
-        <section
-          id="loginPanel"
-          class="tab-panel active"
-          role="tabpanel"
-          aria-labelledby="loginTab"
-        >
+        <section id="loginPanel" class="tab-panel active" role="tabpanel" aria-labelledby="loginTab">
           <form id="loginForm" novalidate>
             <div class="field">
               <label for="loginUser">E-mail ou CPF</label>
               <div class="input-wrap">
-                <input
-                  id="loginUser"
-                  name="loginUser"
-                  type="text"
-                  autocomplete="username"
-                  placeholder="Digite seu e-mail ou CPF"
-                  required
-                >
+                <span class="input-icon" aria-hidden="true">●</span>
+                <input id="loginUser" name="loginUser" type="text" autocomplete="username" placeholder="Digite seu e-mail ou CPF" required>
               </div>
               <small class="field-error" data-error-for="loginUser"></small>
             </div>
@@ -114,29 +82,12 @@
             <div class="field">
               <div class="label-row">
                 <label for="loginPassword">Senha</label>
-                <button id="forgotPassword" class="text-button" type="button">
-                  Esqueci minha senha
-                </button>
+                <button class="text-button" type="button" id="forgotPassword">Esqueci minha senha</button>
               </div>
-
               <div class="input-wrap">
-                <input
-                  id="loginPassword"
-                  name="loginPassword"
-                  type="password"
-                  autocomplete="current-password"
-                  placeholder="Digite sua senha"
-                  minlength="8"
-                  required
-                >
-                <button
-                  class="password-toggle"
-                  type="button"
-                  data-toggle-password="loginPassword"
-                  aria-label="Mostrar senha"
-                >
-                  Mostrar
-                </button>
+                <span class="input-icon" aria-hidden="true">◆</span>
+                <input id="loginPassword" name="loginPassword" type="password" autocomplete="current-password" placeholder="Digite sua senha" required minlength="8">
+                <button class="password-toggle" type="button" data-toggle-password="loginPassword" aria-label="Mostrar senha">Mostrar</button>
               </div>
               <small class="field-error" data-error-for="loginPassword"></small>
             </div>
@@ -146,312 +97,151 @@
               <span>Lembrar meu acesso neste aparelho</span>
             </label>
 
-            <button class="primary-button" type="submit">
-              Entrar no aplicativo
-            </button>
+            <button class="primary-button" type="submit">Entrar no aplicativo</button>
 
-            <p class="info-note">
-              A autenticação será ativada quando o banco de dados for conectado.
+            <p class="approval-note">
+              O primeiro cadastro cria o administrador inicial. Usuários adicionados depois dependerão de autorização.
             </p>
           </form>
         </section>
 
-        <section
-          id="registerPanel"
-          class="tab-panel"
-          role="tabpanel"
-          aria-labelledby="registerTab"
-          hidden
-        >
-          <div id="registrationContent">
-            <div class="stepper" aria-label="Progresso do cadastro">
-              <div class="stepper__top">
-                <strong id="stepLabel">Etapa 1 de 3</strong>
-                <span id="stepName">Responsável</span>
-              </div>
-              <div class="step-track" aria-hidden="true">
-                <span id="stepProgress"></span>
-              </div>
-              <ol class="step-dots">
-                <li class="active" data-step-dot="1">Responsável</li>
-                <li data-step-dot="2">Empresa</li>
-                <li data-step-dot="3">Revisão</li>
-              </ol>
+        <section id="registerPanel" class="tab-panel" role="tabpanel" aria-labelledby="registerTab" hidden>
+          <div id="typeSelection" class="type-selection">
+            <div class="selection-heading">
+              <p class="eyebrow">Tipo de cadastro</p>
+              <h3>Como deseja se cadastrar?</h3>
+              <p>Escolha a opção que representa sua operação neste momento.</p>
             </div>
 
+            <div class="type-grid" role="radiogroup" aria-label="Tipo de cadastro">
+              <button class="type-card" type="button" data-registration-type="pf" role="radio" aria-checked="false">
+                <span class="type-card__icon" aria-hidden="true">PF</span>
+                <span class="type-card__content">
+                  <strong>Pessoa Física</strong>
+                  <small>Para quem trabalha em nome próprio, sem CNPJ.</small>
+                </span>
+                <span class="type-card__check" aria-hidden="true">✓</span>
+              </button>
+
+              <button class="type-card" type="button" data-registration-type="pj" role="radio" aria-checked="false">
+                <span class="type-card__icon" aria-hidden="true">PJ</span>
+                <span class="type-card__content">
+                  <strong>Pessoa Jurídica</strong>
+                  <small>Para empresa formalizada com CNPJ e responsável pessoa física.</small>
+                </span>
+                <span class="type-card__check" aria-hidden="true">✓</span>
+              </button>
+            </div>
+
+            <button id="startRegistration" class="primary-button" type="button" disabled>Continuar</button>
+            <button id="backToLogin" class="secondary-button" type="button">Voltar para entrar</button>
+          </div>
+
+          <div id="registrationWizard" hidden>
+            <div class="wizard-heading">
+              <button id="changeRegistrationType" class="text-button" type="button">← Trocar tipo de cadastro</button>
+              <span id="selectedTypeBadge" class="type-badge"></span>
+            </div>
+
+            <div class="step-summary" aria-live="polite">
+              <div>
+                <span id="stepLabel">Etapa 1</span>
+                <strong id="stepName">Dados</strong>
+              </div>
+              <span id="stepCounter">1 de 3</span>
+            </div>
+            <div class="step-track"><span id="stepProgress"></span></div>
+            <div id="stepDots" class="step-dots" aria-label="Progresso do cadastro"></div>
+
             <form id="registerForm" novalidate>
-              <section class="form-step active" data-step="1">
-                <div class="section-heading">
-                  <h3>Dados do responsável</h3>
-                  <p>Este usuário será o proprietário e administrador inicial.</p>
-                </div>
-
-                <div class="field">
-                  <label for="fullName">Nome completo</label>
-                  <div class="input-wrap">
-                    <input
-                      id="fullName"
-                      name="fullName"
-                      type="text"
-                      autocomplete="name"
-                      placeholder="Digite nome e sobrenome"
-                      minlength="5"
-                      required
-                    >
-                  </div>
-                  <small class="field-error" data-error-for="fullName"></small>
-                </div>
-
-                <div class="form-grid">
-                  <div class="field">
-                    <label for="cpf">CPF</label>
-                    <div class="input-wrap">
-                      <input
-                        id="cpf"
-                        name="cpf"
-                        type="text"
-                        inputmode="numeric"
-                        placeholder="000.000.000-00"
-                        maxlength="14"
-                        required
-                      >
-                    </div>
-                    <small class="field-error" data-error-for="cpf"></small>
+              <div id="stepsContainer">
+                <section class="form-step" data-flow="pf" data-step-key="pf-person" hidden>
+                  <div class="section-heading">
+                    <h3>Dados pessoais</h3>
+                    <p>Informações do proprietário que trabalhará em nome próprio.</p>
                   </div>
 
                   <div class="field">
-                    <label for="phone">Telefone/WhatsApp</label>
-                    <div class="input-wrap">
-                      <input
-                        id="phone"
-                        name="phone"
-                        type="tel"
-                        inputmode="tel"
-                        autocomplete="tel"
-                        placeholder="(00) 00000-0000"
-                        maxlength="15"
-                        required
-                      >
-                    </div>
-                    <small class="field-error" data-error-for="phone"></small>
+                    <label for="pfFullName">Nome completo</label>
+                    <div class="input-wrap"><input id="pfFullName" name="pfFullName" autocomplete="name" placeholder="Digite nome e sobrenome" required></div>
+                    <small class="field-error" data-error-for="pfFullName"></small>
                   </div>
-                </div>
 
-                <div class="field">
-                  <label for="email">E-mail</label>
-                  <div class="input-wrap">
-                    <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      autocomplete="email"
-                      placeholder="seuemail@exemplo.com"
-                      required
-                    >
-                  </div>
-                  <small class="field-error" data-error-for="email"></small>
-                </div>
-
-                <div class="form-grid">
-                  <div class="field">
-                    <label for="password">Criar senha</label>
-                    <div class="input-wrap">
-                      <input
-                        id="password"
-                        name="password"
-                        type="password"
-                        autocomplete="new-password"
-                        placeholder="Mínimo de 8 caracteres"
-                        minlength="8"
-                        required
-                      >
-                      <button
-                        class="password-toggle"
-                        type="button"
-                        data-toggle-password="password"
-                        aria-label="Mostrar senha"
-                      >
-                        Mostrar
-                      </button>
+                  <div class="form-grid">
+                    <div class="field">
+                      <label for="pfCpf">CPF</label>
+                      <div class="input-wrap"><input id="pfCpf" name="pfCpf" inputmode="numeric" placeholder="000.000.000-00" maxlength="14" required></div>
+                      <small class="field-error" data-error-for="pfCpf"></small>
                     </div>
-                    <small class="field-error" data-error-for="password"></small>
+                    <div class="field">
+                      <label for="pfPhone">Telefone/WhatsApp</label>
+                      <div class="input-wrap"><input id="pfPhone" name="pfPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(00) 00000-0000" maxlength="15" required></div>
+                      <small class="field-error" data-error-for="pfPhone"></small>
+                    </div>
                   </div>
 
                   <div class="field">
-                    <label for="passwordConfirm">Confirmar senha</label>
-                    <div class="input-wrap">
-                      <input
-                        id="passwordConfirm"
-                        name="passwordConfirm"
-                        type="password"
-                        autocomplete="new-password"
-                        placeholder="Repita a senha"
-                        minlength="8"
-                        required
-                      >
-                      <button
-                        class="password-toggle"
-                        type="button"
-                        data-toggle-password="passwordConfirm"
-                        aria-label="Mostrar senha"
-                      >
-                        Mostrar
-                      </button>
-                    </div>
-                    <small class="field-error" data-error-for="passwordConfirm"></small>
+                    <label for="pfEmail">E-mail</label>
+                    <div class="input-wrap"><input id="pfEmail" name="pfEmail" type="email" autocomplete="email" placeholder="seuemail@exemplo.com" required></div>
+                    <small class="field-error" data-error-for="pfEmail"></small>
                   </div>
-                </div>
 
-                <div class="password-strength" aria-live="polite">
-                  <div class="strength-track"><span id="strengthBar"></span></div>
-                  <small id="strengthText">Use 8 caracteres, com letra e número.</small>
-                </div>
-              </section>
-
-              <section class="form-step" data-step="2" hidden>
-                <div class="section-heading">
-                  <h3>Dados da empresa ou operação</h3>
-                  <p>Esses dados formarão o ambiente principal do sistema.</p>
-                </div>
-
-                <div class="field">
-                  <label for="companyName">Nome da empresa ou operação</label>
-                  <div class="input-wrap">
-                    <input
-                      id="companyName"
-                      name="companyName"
-                      type="text"
-                      autocomplete="organization"
-                      placeholder="Ex.: Comércio de Castanhas do Hélio"
-                      minlength="3"
-                      required
-                    >
-                  </div>
-                  <small class="field-error" data-error-for="companyName"></small>
-                </div>
-
-                <div class="form-grid">
-                  <div class="field">
-                    <label for="tradeName">Nome fantasia <span class="optional">(opcional)</span></label>
-                    <div class="input-wrap">
-                      <input
-                        id="tradeName"
-                        name="tradeName"
-                        type="text"
-                        placeholder="Nome conhecido comercialmente"
-                      >
+                  <div class="form-grid">
+                    <div class="field">
+                      <label for="pfCity">Cidade</label>
+                      <div class="input-wrap"><input id="pfCity" name="pfCity" autocomplete="address-level2" placeholder="Sua cidade" required></div>
+                      <small class="field-error" data-error-for="pfCity"></small>
                     </div>
-                    <small class="field-error" data-error-for="tradeName"></small>
+                    <div class="field">
+                      <label for="pfState">Estado</label>
+                      <div class="input-wrap">
+                        <select id="pfState" name="pfState" autocomplete="address-level1" required>
+                          <option value="">Selecione</option>
+                        </select>
+                      </div>
+                      <small class="field-error" data-error-for="pfState"></small>
+                    </div>
                   </div>
 
                   <div class="field">
-                    <label for="companyDocument">CPF ou CNPJ <span class="optional">(opcional)</span></label>
-                    <div class="input-wrap">
-                      <input
-                        id="companyDocument"
-                        name="companyDocument"
-                        type="text"
-                        inputmode="numeric"
-                        placeholder="CPF ou CNPJ"
-                        maxlength="18"
-                      >
+                    <label for="pfOperationName">Nome da operação <span class="optional">opcional</span></label>
+                    <div class="input-wrap"><input id="pfOperationName" name="pfOperationName" placeholder="Ex.: Castanhas do Hélio"></div>
+                    <small class="field-hint">Você poderá alterar esse nome posteriormente.</small>
+                  </div>
+                </section>
+
+                <section class="form-step" data-flow="pf" data-step-key="pf-access" hidden>
+                  <div class="section-heading">
+                    <h3>Dados de acesso</h3>
+                    <p>Esta senha será usada pelo proprietário e administrador inicial.</p>
+                  </div>
+
+                  <div class="form-grid">
+                    <div class="field">
+                      <label for="pfPassword">Criar senha</label>
+                      <div class="input-wrap">
+                        <input id="pfPassword" name="pfPassword" type="password" autocomplete="new-password" placeholder="Mínimo de 8 caracteres" required minlength="8">
+                        <button class="password-toggle" type="button" data-toggle-password="pfPassword" aria-label="Mostrar senha">Mostrar</button>
+                      </div>
+                      <small class="field-error" data-error-for="pfPassword"></small>
                     </div>
-                    <small class="field-error" data-error-for="companyDocument"></small>
-                  </div>
-                </div>
-
-                <div class="form-grid">
-                  <div class="field">
-                    <label for="city">Cidade</label>
-                    <div class="input-wrap">
-                      <input
-                        id="city"
-                        name="city"
-                        type="text"
-                        autocomplete="address-level2"
-                        placeholder="Digite a cidade"
-                        required
-                      >
+                    <div class="field">
+                      <label for="pfPasswordConfirm">Confirmar senha</label>
+                      <div class="input-wrap">
+                        <input id="pfPasswordConfirm" name="pfPasswordConfirm" type="password" autocomplete="new-password" placeholder="Repita sua senha" required minlength="8">
+                        <button class="password-toggle" type="button" data-toggle-password="pfPasswordConfirm" aria-label="Mostrar senha">Mostrar</button>
+                      </div>
+                      <small class="field-error" data-error-for="pfPasswordConfirm"></small>
                     </div>
-                    <small class="field-error" data-error-for="city"></small>
                   </div>
 
-                  <div class="field">
-                    <label for="state">Estado</label>
-                    <div class="input-wrap select-wrap">
-                      <select id="state" name="state" autocomplete="address-level1" required>
-                        <option value="">Selecione</option>
-                        <option value="AC">Acre</option>
-                        <option value="AL">Alagoas</option>
-                        <option value="AP">Amapá</option>
-                        <option value="AM">Amazonas</option>
-                        <option value="BA">Bahia</option>
-                        <option value="CE">Ceará</option>
-                        <option value="DF">Distrito Federal</option>
-                        <option value="ES">Espírito Santo</option>
-                        <option value="GO">Goiás</option>
-                        <option value="MA">Maranhão</option>
-                        <option value="MT">Mato Grosso</option>
-                        <option value="MS">Mato Grosso do Sul</option>
-                        <option value="MG">Minas Gerais</option>
-                        <option value="PA">Pará</option>
-                        <option value="PB">Paraíba</option>
-                        <option value="PR">Paraná</option>
-                        <option value="PE">Pernambuco</option>
-                        <option value="PI">Piauí</option>
-                        <option value="RJ">Rio de Janeiro</option>
-                        <option value="RN">Rio Grande do Norte</option>
-                        <option value="RS">Rio Grande do Sul</option>
-                        <option value="RO">Rondônia</option>
-                        <option value="RR">Roraima</option>
-                        <option value="SC">Santa Catarina</option>
-                        <option value="SP">São Paulo</option>
-                        <option value="SE">Sergipe</option>
-                        <option value="TO">Tocantins</option>
-                      </select>
-                    </div>
-                    <small class="field-error" data-error-for="state"></small>
-                  </div>
-                </div>
-
-                <div class="role-card">
-                  <div class="role-card__icon" aria-hidden="true">A</div>
-                  <div>
-                    <strong>Perfil inicial</strong>
-                    <p>Proprietário e administrador, com acesso completo à empresa cadastrada.</p>
-                  </div>
-                </div>
-              </section>
-
-              <section class="form-step" data-step="3" hidden>
-                <div class="section-heading">
-                  <h3>Revise antes de concluir</h3>
-                  <p>Confirme os dados principais do primeiro cadastro.</p>
-                </div>
-
-                <div class="review-card">
-                  <div class="review-group">
-                    <span>Responsável</span>
-                    <strong id="reviewName">—</strong>
-                    <small id="reviewContact">—</small>
+                  <div class="password-strength" data-strength-for="pfPassword">
+                    <div class="strength-track"><span></span></div>
+                    <small>Use 8 caracteres, com letra e número.</small>
                   </div>
 
-                  <div class="review-group">
-                    <span>Empresa ou operação</span>
-                    <strong id="reviewCompany">—</strong>
-                    <small id="reviewLocation">—</small>
-                  </div>
-
-                  <div class="review-group">
-                    <span>Perfil de acesso</span>
-                    <strong>Proprietário e administrador inicial</strong>
-                    <small>Acesso completo após a ativação da autenticação.</small>
-                  </div>
-                </div>
-
-                <div class="terms-box">
-                  <label class="check-row">
-                    <input id="terms" name="terms" type="checkbox" required>
+                  <label class="check-row terms-row">
+                    <input id="pfTerms" name="pfTerms" type="checkbox" required>
                     <span>
                       Declaro que as informações são verdadeiras e aceito os
                       <button type="button" class="inline-link" data-modal="termsModal">termos de uso</button>
@@ -459,45 +249,236 @@
                       <button type="button" class="inline-link" data-modal="privacyModal">política de privacidade</button>.
                     </span>
                   </label>
-                  <small class="field-error standalone" data-error-for="terms"></small>
-                </div>
+                  <small class="field-error standalone" data-error-for="pfTerms"></small>
+                </section>
 
-                <p class="info-note">
-                  Nesta etapa do projeto, o formulário é validado no aparelho, mas ainda
-                  não envia nem armazena dados.
-                </p>
-              </section>
+                <section class="form-step" data-flow="pf" data-step-key="pf-review" hidden>
+                  <div class="section-heading">
+                    <h3>Revise o cadastro</h3>
+                    <p>Confira os dados antes de criar o acesso administrativo.</p>
+                  </div>
 
-              <div class="form-actions">
-                <button id="backStep" class="secondary-button" type="button" hidden>
-                  Voltar
-                </button>
-                <button id="nextStep" class="primary-button primary-button--compact" type="button">
-                  Continuar
-                </button>
-                <button id="submitRegistration" class="primary-button primary-button--compact" type="submit" hidden>
-                  Concluir cadastro
-                </button>
+                  <div class="review-card">
+                    <span>Tipo de cadastro</span>
+                    <strong>Pessoa Física</strong>
+                  </div>
+                  <div class="review-card">
+                    <span>Responsável</span>
+                    <strong id="pfReviewName">—</strong>
+                    <small id="pfReviewDocument">—</small>
+                    <small id="pfReviewContact">—</small>
+                  </div>
+                  <div class="review-card">
+                    <span>Operação</span>
+                    <strong id="pfReviewOperation">—</strong>
+                    <small id="pfReviewLocation">—</small>
+                  </div>
+                  <div class="profile-notice">
+                    <strong>Perfil inicial</strong>
+                    <p>Proprietário e administrador, com acesso completo ao sistema.</p>
+                  </div>
+                </section>
+
+                <section class="form-step" data-flow="pj" data-step-key="pj-company" hidden>
+                  <div class="section-heading">
+                    <h3>Dados da pessoa jurídica</h3>
+                    <p>Comece pelas informações oficiais da empresa.</p>
+                  </div>
+
+                  <div class="field">
+                    <label for="pjLegalName">Razão social</label>
+                    <div class="input-wrap"><input id="pjLegalName" name="pjLegalName" autocomplete="organization" placeholder="Razão social da empresa" required></div>
+                    <small class="field-error" data-error-for="pjLegalName"></small>
+                  </div>
+
+                  <div class="form-grid">
+                    <div class="field">
+                      <label for="pjTradeName">Nome fantasia</label>
+                      <div class="input-wrap"><input id="pjTradeName" name="pjTradeName" placeholder="Nome conhecido da empresa" required></div>
+                      <small class="field-error" data-error-for="pjTradeName"></small>
+                    </div>
+                    <div class="field">
+                      <label for="pjCnpj">CNPJ</label>
+                      <div class="input-wrap"><input id="pjCnpj" name="pjCnpj" inputmode="numeric" placeholder="00.000.000/0000-00" maxlength="18" required></div>
+                      <small class="field-error" data-error-for="pjCnpj"></small>
+                    </div>
+                  </div>
+
+                  <div class="form-grid">
+                    <div class="field">
+                      <label for="pjStateRegistration">Inscrição estadual <span class="optional">opcional</span></label>
+                      <div class="input-wrap"><input id="pjStateRegistration" name="pjStateRegistration" placeholder="Inscrição estadual"></div>
+                    </div>
+                    <div class="field">
+                      <label for="pjCompanyPhone">Telefone da empresa</label>
+                      <div class="input-wrap"><input id="pjCompanyPhone" name="pjCompanyPhone" type="tel" inputmode="tel" placeholder="(00) 00000-0000" maxlength="15" required></div>
+                      <small class="field-error" data-error-for="pjCompanyPhone"></small>
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <label for="pjCompanyEmail">E-mail da empresa</label>
+                    <div class="input-wrap"><input id="pjCompanyEmail" name="pjCompanyEmail" type="email" autocomplete="organization-email" placeholder="empresa@exemplo.com" required></div>
+                    <small class="field-error" data-error-for="pjCompanyEmail"></small>
+                  </div>
+
+                  <div class="form-grid">
+                    <div class="field">
+                      <label for="pjCity">Cidade</label>
+                      <div class="input-wrap"><input id="pjCity" name="pjCity" autocomplete="address-level2" placeholder="Cidade da empresa" required></div>
+                      <small class="field-error" data-error-for="pjCity"></small>
+                    </div>
+                    <div class="field">
+                      <label for="pjState">Estado</label>
+                      <div class="input-wrap"><select id="pjState" name="pjState" autocomplete="address-level1" required><option value="">Selecione</option></select></div>
+                      <small class="field-error" data-error-for="pjState"></small>
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <label for="pjAddress">Endereço <span class="optional">opcional</span></label>
+                    <div class="input-wrap"><input id="pjAddress" name="pjAddress" autocomplete="street-address" placeholder="Rua, número e complemento"></div>
+                  </div>
+                </section>
+
+                <section class="form-step" data-flow="pj" data-step-key="pj-responsible" hidden>
+                  <div class="section-heading">
+                    <h3>Responsável pessoa física</h3>
+                    <p>Esta pessoa será o primeiro administrador vinculado à empresa.</p>
+                  </div>
+
+                  <div class="field">
+                    <label for="pjResponsibleName">Nome completo</label>
+                    <div class="input-wrap"><input id="pjResponsibleName" name="pjResponsibleName" autocomplete="name" placeholder="Nome e sobrenome" required></div>
+                    <small class="field-error" data-error-for="pjResponsibleName"></small>
+                  </div>
+
+                  <div class="form-grid">
+                    <div class="field">
+                      <label for="pjResponsibleCpf">CPF</label>
+                      <div class="input-wrap"><input id="pjResponsibleCpf" name="pjResponsibleCpf" inputmode="numeric" placeholder="000.000.000-00" maxlength="14" required></div>
+                      <small class="field-error" data-error-for="pjResponsibleCpf"></small>
+                    </div>
+                    <div class="field">
+                      <label for="pjResponsibleRole">Função na empresa</label>
+                      <div class="input-wrap">
+                        <select id="pjResponsibleRole" name="pjResponsibleRole" required>
+                          <option value="">Selecione</option>
+                          <option>Proprietário</option>
+                          <option>Sócio</option>
+                          <option>Administrador</option>
+                          <option>Representante autorizado</option>
+                        </select>
+                      </div>
+                      <small class="field-error" data-error-for="pjResponsibleRole"></small>
+                    </div>
+                  </div>
+
+                  <div class="form-grid">
+                    <div class="field">
+                      <label for="pjResponsiblePhone">Telefone/WhatsApp</label>
+                      <div class="input-wrap"><input id="pjResponsiblePhone" name="pjResponsiblePhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(00) 00000-0000" maxlength="15" required></div>
+                      <small class="field-error" data-error-for="pjResponsiblePhone"></small>
+                    </div>
+                    <div class="field">
+                      <label for="pjResponsibleEmail">E-mail do responsável</label>
+                      <div class="input-wrap"><input id="pjResponsibleEmail" name="pjResponsibleEmail" type="email" autocomplete="email" placeholder="responsavel@exemplo.com" required></div>
+                      <small class="field-error" data-error-for="pjResponsibleEmail"></small>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="form-step" data-flow="pj" data-step-key="pj-access" hidden>
+                  <div class="section-heading">
+                    <h3>Dados de acesso</h3>
+                    <p>A senha pertence à pessoa responsável, e não à empresa.</p>
+                  </div>
+
+                  <div class="form-grid">
+                    <div class="field">
+                      <label for="pjPassword">Criar senha</label>
+                      <div class="input-wrap">
+                        <input id="pjPassword" name="pjPassword" type="password" autocomplete="new-password" placeholder="Mínimo de 8 caracteres" required minlength="8">
+                        <button class="password-toggle" type="button" data-toggle-password="pjPassword" aria-label="Mostrar senha">Mostrar</button>
+                      </div>
+                      <small class="field-error" data-error-for="pjPassword"></small>
+                    </div>
+                    <div class="field">
+                      <label for="pjPasswordConfirm">Confirmar senha</label>
+                      <div class="input-wrap">
+                        <input id="pjPasswordConfirm" name="pjPasswordConfirm" type="password" autocomplete="new-password" placeholder="Repita sua senha" required minlength="8">
+                        <button class="password-toggle" type="button" data-toggle-password="pjPasswordConfirm" aria-label="Mostrar senha">Mostrar</button>
+                      </div>
+                      <small class="field-error" data-error-for="pjPasswordConfirm"></small>
+                    </div>
+                  </div>
+
+                  <div class="password-strength" data-strength-for="pjPassword">
+                    <div class="strength-track"><span></span></div>
+                    <small>Use 8 caracteres, com letra e número.</small>
+                  </div>
+
+                  <label class="check-row terms-row">
+                    <input id="pjTerms" name="pjTerms" type="checkbox" required>
+                    <span>
+                      Confirmo que sou responsável ou autorizado pela empresa e aceito os
+                      <button type="button" class="inline-link" data-modal="termsModal">termos de uso</button>
+                      e a
+                      <button type="button" class="inline-link" data-modal="privacyModal">política de privacidade</button>.
+                    </span>
+                  </label>
+                  <small class="field-error standalone" data-error-for="pjTerms"></small>
+                </section>
+
+                <section class="form-step" data-flow="pj" data-step-key="pj-review" hidden>
+                  <div class="section-heading">
+                    <h3>Revise o cadastro</h3>
+                    <p>Confira a empresa e o responsável antes de concluir.</p>
+                  </div>
+
+                  <div class="review-card">
+                    <span>Empresa</span>
+                    <strong id="pjReviewCompany">—</strong>
+                    <small id="pjReviewCnpj">—</small>
+                    <small id="pjReviewCompanyContact">—</small>
+                    <small id="pjReviewLocation">—</small>
+                  </div>
+                  <div class="review-card">
+                    <span>Responsável</span>
+                    <strong id="pjReviewResponsible">—</strong>
+                    <small id="pjReviewResponsibleDocument">—</small>
+                    <small id="pjReviewRole">—</small>
+                    <small id="pjReviewResponsibleContact">—</small>
+                  </div>
+                  <div class="profile-notice">
+                    <strong>Perfil inicial</strong>
+                    <p>Responsável pela empresa e administrador principal, com acesso completo.</p>
+                  </div>
+                </section>
+              </div>
+
+              <div class="wizard-actions">
+                <button id="previousStep" class="secondary-button" type="button">Voltar</button>
+                <button id="nextStep" class="primary-button" type="button">Continuar</button>
+                <button id="finishRegistration" class="primary-button" type="submit" hidden>Concluir cadastro</button>
               </div>
             </form>
           </div>
 
-          <section id="registrationSuccess" class="success-state" hidden>
-            <div class="success-state__icon" aria-hidden="true">✓</div>
+          <div id="registrationSuccess" class="success-state" hidden tabindex="-1">
+            <span class="success-icon" aria-hidden="true">✓</span>
             <p class="eyebrow">Cadastro validado</p>
-            <h3>Estrutura inicial concluída</h3>
-            <p>
-              Os dados foram validados no aparelho. O envio definitivo será ativado
-              quando conectarmos a autenticação e o banco de dados.
+            <h3 id="successTitle">Estrutura pronta</h3>
+            <p id="successMessage">
+              Os dados foram validados nesta demonstração. O envio real será ativado quando conectarmos o banco de dados.
             </p>
-            <button id="newRegistration" class="secondary-button" type="button">
-              Fazer novo cadastro
-            </button>
-          </section>
+            <button id="newRegistration" class="primary-button" type="button">Fazer outro cadastro</button>
+            <button id="successBackToLogin" class="secondary-button" type="button">Voltar para entrar</button>
+          </div>
         </section>
       </div>
 
-      <footer class="page-footer">© 2026 Mais Castanhas. Todos os direitos reservados.</footer>
+      <p class="page-footer">© 2026 Mais Castanhas. Todos os direitos reservados.</p>
     </section>
   </main>
 
