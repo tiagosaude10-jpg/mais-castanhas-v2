@@ -46,6 +46,116 @@
       }
       .profile-select-wrap select { text-align:center; text-align-last:center; }
       .profile-select-description { display:block; min-height:18px; margin-top:10px; color:#69736b; font-size:.78rem; line-height:1.45; text-align:center; }
+
+      .success-state.success-enhanced {
+        text-align:center;
+      }
+      .success-visual-stack {
+        display:grid;
+        gap:16px;
+        margin:6px 0 22px;
+      }
+      .success-info-card {
+        position:relative;
+        padding:20px 18px;
+        border:2px solid transparent;
+        border-radius:20px;
+        text-align:center;
+        box-shadow:0 10px 28px rgba(55,75,52,.08);
+      }
+      .success-info-card h3,
+      .success-info-card h4,
+      .success-info-card p {
+        margin-left:auto;
+        margin-right:auto;
+        text-align:center;
+      }
+      .success-info-card h3 {
+        margin-top:8px;
+        margin-bottom:10px;
+        color:#12391a;
+        font-size:1.35rem;
+        line-height:1.22;
+      }
+      .success-info-card h4 {
+        margin-top:6px;
+        margin-bottom:8px;
+        color:#173b1e;
+        font-size:1rem;
+      }
+      .success-info-card p {
+        margin-top:0;
+        margin-bottom:0;
+        color:#58645c;
+        line-height:1.55;
+      }
+      .success-card-status {
+        border-color:#d49a42;
+        background:#fff8e8;
+      }
+      .success-card-process {
+        border-color:#77a57c;
+        background:#f3f8f2;
+      }
+      .success-card-contact {
+        border-color:#b07a55;
+        background:#fff4eb;
+      }
+      .success-card-icon {
+        display:grid;
+        place-items:center;
+        width:44px;
+        height:44px;
+        margin:0 auto 8px;
+        border-radius:50%;
+        font-size:1.2rem;
+        font-weight:900;
+      }
+      .success-card-status .success-card-icon {
+        color:#8b4d12;
+        background:#f7dcae;
+      }
+      .success-card-process .success-card-icon {
+        color:#245c2c;
+        background:#dcebdc;
+      }
+      .success-card-contact .success-card-icon {
+        color:#7a3f20;
+        background:#f2d9c7;
+      }
+      .success-state.success-enhanced .pending-badge {
+        margin:0 auto 8px;
+        border:1px solid #c7802f;
+        background:#f7dcae;
+        color:#743d15;
+      }
+      .success-state.success-enhanced .eyebrow {
+        margin:4px 0 0;
+        color:#5f6c63;
+      }
+      .success-contact-channels {
+        display:flex;
+        justify-content:center;
+        flex-wrap:wrap;
+        gap:8px;
+        margin-top:14px;
+      }
+      .success-channel {
+        display:inline-flex;
+        align-items:center;
+        gap:6px;
+        padding:8px 12px;
+        border:1px solid #d8b79e;
+        border-radius:999px;
+        color:#6b3e24;
+        background:#fff;
+        font-size:.78rem;
+        font-weight:800;
+      }
+      .success-state.success-enhanced > .primary-button,
+      .success-state.success-enhanced > .secondary-button {
+        margin-top:12px;
+      }
     `;
     document.head.appendChild(style);
   }
@@ -142,11 +252,68 @@
     if (state.value) loadCities(state, city);
   }
 
+  function enhanceSuccessScreen() {
+    const success = document.getElementById('registrationSuccess');
+    if (!success || success.dataset.visualEnhanced === 'true') return;
+
+    const badge = success.querySelector('.pending-badge');
+    const eyebrow = success.querySelector('.eyebrow');
+    const title = success.querySelector('h3');
+    const summary = title?.nextElementSibling?.tagName === 'P' ? title.nextElementSibling : null;
+    const notice = success.querySelector('.analysis-notice');
+    const primaryButton = success.querySelector('#newRegistration');
+
+    if (!badge || !title || !summary || !notice || !primaryButton) return;
+
+    const stack = document.createElement('div');
+    stack.className = 'success-visual-stack';
+
+    const statusCard = document.createElement('section');
+    statusCard.className = 'success-info-card success-card-status';
+    statusCard.setAttribute('aria-label', 'Status do cadastro');
+    statusCard.append(badge, eyebrow || document.createTextNode(''), title);
+
+    const processCard = document.createElement('section');
+    processCard.className = 'success-info-card success-card-process';
+    processCard.setAttribute('aria-label', 'Próxima etapa');
+    processCard.innerHTML = '<span class="success-card-icon" aria-hidden="true">✓</span><h4>O que acontece agora</h4>';
+    processCard.append(summary);
+    const processDetail = document.createElement('p');
+    processDetail.textContent = 'O acesso permanecerá bloqueado até que um administrador conclua a análise e autorize o perfil solicitado.';
+    processDetail.style.marginTop = '10px';
+    processCard.append(processDetail);
+
+    const contactCard = document.createElement('section');
+    contactCard.className = 'success-info-card success-card-contact';
+    contactCard.setAttribute('aria-label', 'Forma de retorno');
+    contactCard.innerHTML = '<span class="success-card-icon" aria-hidden="true">!</span>';
+    while (notice.firstChild) contactCard.append(notice.firstChild);
+    const channels = document.createElement('div');
+    channels.className = 'success-contact-channels';
+    channels.innerHTML = '<span class="success-channel">E-mail informado</span><span class="success-channel">WhatsApp informado</span>';
+    contactCard.append(channels);
+    notice.remove();
+
+    stack.append(statusCard, processCard, contactCard);
+    success.insertBefore(stack, primaryButton);
+    success.classList.add('success-enhanced');
+    success.dataset.visualEnhanced = 'true';
+  }
+
+  function watchSuccessScreen() {
+    const success = document.getElementById('registrationSuccess');
+    if (!success) return;
+    const observer = new MutationObserver(() => enhanceSuccessScreen());
+    observer.observe(success, { childList:true, subtree:false });
+    enhanceSuccessScreen();
+  }
+
   function init() {
     installStyles();
     configureLocation('pfState', 'pfCity');
     configureLocation('pjState', 'pjCity');
     compactProfiles();
+    watchSuccessScreen();
   }
 
   if (document.readyState === 'loading') {
