@@ -47,14 +47,8 @@
       .profile-select-wrap select { text-align:center; text-align-last:center; }
       .profile-select-description { display:block; min-height:18px; margin-top:10px; color:#69736b; font-size:.78rem; line-height:1.45; text-align:center; }
 
-      .success-state.success-enhanced {
-        text-align:center;
-      }
-      .success-visual-stack {
-        display:grid;
-        gap:16px;
-        margin:6px 0 22px;
-      }
+      .success-state.success-enhanced { text-align:center; }
+      .success-visual-stack { display:grid; gap:16px; margin:6px 0 22px; }
       .success-info-card {
         position:relative;
         padding:20px 18px;
@@ -89,18 +83,9 @@
         color:#58645c;
         line-height:1.55;
       }
-      .success-card-status {
-        border-color:#d49a42;
-        background:#fff8e8;
-      }
-      .success-card-process {
-        border-color:#77a57c;
-        background:#f3f8f2;
-      }
-      .success-card-contact {
-        border-color:#b07a55;
-        background:#fff4eb;
-      }
+      .success-card-status { border-color:#d49a42; background:#fff8e8; }
+      .success-card-process { border-color:#77a57c; background:#f3f8f2; }
+      .success-card-contact { border-color:#b07a55; background:#fff4eb; }
       .success-card-icon {
         display:grid;
         place-items:center;
@@ -111,28 +96,16 @@
         font-size:1.2rem;
         font-weight:900;
       }
-      .success-card-status .success-card-icon {
-        color:#8b4d12;
-        background:#f7dcae;
-      }
-      .success-card-process .success-card-icon {
-        color:#245c2c;
-        background:#dcebdc;
-      }
-      .success-card-contact .success-card-icon {
-        color:#7a3f20;
-        background:#f2d9c7;
-      }
+      .success-card-status .success-card-icon { color:#8b4d12; background:#f7dcae; }
+      .success-card-process .success-card-icon { color:#245c2c; background:#dcebdc; }
+      .success-card-contact .success-card-icon { color:#7a3f20; background:#f2d9c7; }
       .success-state.success-enhanced .pending-badge {
         margin:0 auto 8px;
         border:1px solid #c7802f;
         background:#f7dcae;
         color:#743d15;
       }
-      .success-state.success-enhanced .eyebrow {
-        margin:4px 0 0;
-        color:#5f6c63;
-      }
+      .success-state.success-enhanced .eyebrow { margin:4px 0 0; color:#5f6c63; }
       .success-contact-channels {
         display:flex;
         justify-content:center;
@@ -153,9 +126,7 @@
         font-weight:800;
       }
       .success-state.success-enhanced > .primary-button,
-      .success-state.success-enhanced > .secondary-button {
-        margin-top:12px;
-      }
+      .success-state.success-enhanced > .secondary-button { margin-top:12px; }
     `;
     document.head.appendChild(style);
   }
@@ -308,12 +279,22 @@
     enhanceSuccessScreen();
   }
 
+  function loadAdvancedFlows() {
+    if (document.querySelector('script[data-flows-v13]')) return;
+    const script = document.createElement('script');
+    script.src = './flows-v13.js?v=13';
+    script.defer = true;
+    script.dataset.flowsV13 = 'true';
+    document.head.appendChild(script);
+  }
+
   function init() {
     installStyles();
     configureLocation('pfState', 'pfCity');
     configureLocation('pjState', 'pjCity');
     compactProfiles();
     watchSuccessScreen();
+    loadAdvancedFlows();
   }
 
   if (document.readyState === 'loading') {
