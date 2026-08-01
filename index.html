@@ -10,6 +10,7 @@
   <title>Mais Castanhas — Entrada e cadastro</title>
 
   <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="preload" href="./logo-mais-castanhas.webp" as="image" type="image/webp">
   <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
   <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
@@ -23,7 +24,9 @@
       <div class="brand-panel__content">
         <img
           class="brand-logo"
-          src="./logo-mais-castanhas.png"
+          decoding="async"
+          fetchpriority="high"
+          src="./logo-mais-castanhas.webp"
           alt="Mais Castanhas — Conexão que gera valor"
           width="1100"
           height="825"
@@ -50,7 +53,7 @@
 
     <section class="auth-panel">
       <header class="mobile-brand">
-        <img src="./logo-mais-castanhas.png" alt="Mais Castanhas" width="1100" height="825">
+        <img src="./logo-mais-castanhas.webp" alt="Mais Castanhas" decoding="async" fetchpriority="high" width="1100" height="825">
       </header>
 
       <div class="auth-card">
