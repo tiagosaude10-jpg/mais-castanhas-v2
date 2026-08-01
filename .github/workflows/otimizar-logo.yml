@@ -1,0 +1,134 @@
+name: Otimizar logo do Mais Castanhas
+
+on:
+  push:
+    paths:
+      - '.github/workflows/otimizar-logo.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  otimizar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar Pillow
+        run: python -m pip install --quiet pillow
+
+      - name: Gerar logo WebP leve
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+
+          origem = Path('logo-mais-castanhas.png')
+          destino = Path('logo-mais-castanhas.webp')
+
+          imagem = Image.open(origem).convert('RGB')
+          imagem.thumbnail((900, 900), Image.Resampling.LANCZOS)
+          imagem.save(destino, 'WEBP', quality=78, method=6)
+
+          print('PNG original:', origem.stat().st_size, 'bytes')
+          print('WebP otimizado:', destino.stat().st_size, 'bytes')
+          print('Dimensões:', imagem.size)
+          PY
+
+      - name: Atualizar página para usar a logo leve
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          arquivo = Path('index.html')
+          html = arquivo.read_text(encoding='utf-8')
+          html = html.replace('src="./logo-mais-castanhas.png"', 'src="./logo-mais-castanhas.webp"')
+
+          preload = '  <link rel="preload" href="./logo-mais-castanhas.webp" as="image" type="image/webp">\n'
+          if 'rel="preload" href="./logo-mais-castanhas.webp"' not in html:
+              html = html.replace('  <link rel="manifest" href="./manifest.webmanifest">\n', '  <link rel="manifest" href="./manifest.webmanifest">\n' + preload)
+
+          html = html.replace('class="brand-logo"\n          src=', 'class="brand-logo"\n          decoding="async"\n          fetchpriority="high"\n          src=')
+          html = html.replace('<img src="./logo-mais-castanhas.webp" alt="Mais Castanhas"', '<img src="./logo-mais-castanhas.webp" alt="Mais Castanhas" decoding="async" fetchpriority="high"')
+
+          arquivo.write_text(html, encoding='utf-8')
+          PY
+
+      - name: Ativar cache eficiente
+        run: |
+          cat > sw.js <<'EOF'
+          const CACHE_NAME = 'mais-castanhas-v6';
+          const APP_FILES = [
+            './',
+            './index.html',
+            './styles.css',
+            './app.js',
+            './manifest.webmanifest',
+            './logo-mais-castanhas.webp',
+            './icon-192.png',
+            './icon-512.png',
+            './apple-touch-icon.png',
+            './favicon-32.png'
+          ];
+
+          self.addEventListener('install', (event) => {
+            event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_FILES)));
+            self.skipWaiting();
+          });
+
+          self.addEventListener('activate', (event) => {
+            event.waitUntil(
+              caches.keys().then((keys) => Promise.all(
+                keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+              ))
+            );
+            self.clients.claim();
+          });
+
+          self.addEventListener('fetch', (event) => {
+            if (event.request.method !== 'GET') return;
+
+            const url = new URL(event.request.url);
+            const isPage = event.request.mode === 'navigate';
+
+            if (isPage) {
+              event.respondWith(
+                fetch(event.request).then((response) => {
+                  const copy = response.clone();
+                  caches.open(CACHE_NAME).then((cache) => cache.put('./index.html', copy));
+                  return response;
+                }).catch(() => caches.match('./index.html'))
+              );
+              return;
+            }
+
+            if (url.origin === self.location.origin) {
+              event.respondWith(
+                caches.match(event.request).then((cached) => cached || fetch(event.request).then((response) => {
+                  const copy = response.clone();
+                  caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+                  return response;
+                }))
+              );
+            }
+          });
+          EOF
+
+      - name: Salvar arquivos otimizados
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add logo-mais-castanhas.webp index.html sw.js
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteração necessária."
+          else
+            git commit -m "Otimiza logo e ativa cache eficiente"
+            git push
+          fi
