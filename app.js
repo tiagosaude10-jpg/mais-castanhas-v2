@@ -15,6 +15,25 @@
   const modalTitle = $("#modalTitle");
   const modalBody = $("#modalBody");
 
+  const registerForm = $("#registerForm");
+  const registrationContent = $("#registrationContent");
+  const registrationSuccess = $("#registrationSuccess");
+  const formSteps = $$(".form-step");
+  const stepDots = $$("[data-step-dot]");
+  const stepLabel = $("#stepLabel");
+  const stepName = $("#stepName");
+  const stepProgress = $("#stepProgress");
+  const backStepButton = $("#backStep");
+  const nextStepButton = $("#nextStep");
+  const submitRegistrationButton = $("#submitRegistration");
+
+  const stepNames = {
+    1: "Responsável",
+    2: "Empresa",
+    3: "Revisão"
+  };
+
+  let currentStep = 1;
   let toastTimer;
 
   function showToast(message) {
@@ -37,13 +56,10 @@
     loginPanel.hidden = !isLogin;
     registerPanel.hidden = isLogin;
 
-    panelTitle.textContent = isLogin
-      ? "Entre na sua conta"
-      : "Crie seu acesso";
-
+    panelTitle.textContent = isLogin ? "Entre na sua conta" : "Faça o primeiro cadastro";
     panelDescription.textContent = isLogin
-      ? "Informe seus dados de acesso para continuar."
-      : "Cadastre seus dados pessoais. O acesso ficará pendente até a aprovação administrativa.";
+      ? "Informe seus dados para continuar."
+      : "Crie a empresa, o proprietário e o primeiro administrador.";
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -77,17 +93,29 @@
       .replace(/(\d{5})(\d)/, "$1-$2");
   }
 
+  function formatDocument(value) {
+    const digits = onlyDigits(value).slice(0, 14);
+
+    if (digits.length <= 11) {
+      return formatCPF(digits);
+    }
+
+    return digits
+      .replace(/^(\d{2})(\d)/, "$1.$2")
+      .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
+      .replace(/\.(\d{3})(\d)/, ".$1/$2")
+      .replace(/(\d{4})(\d)/, "$1-$2");
+  }
+
   function isValidCPF(value) {
     const cpf = onlyDigits(value);
 
-    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) {
-      return false;
-    }
+    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
 
     const calculateDigit = (length) => {
       let sum = 0;
-      for (let i = 0; i < length; i += 1) {
-        sum += Number(cpf[i]) * (length + 1 - i);
+      for (let index = 0; index < length; index += 1) {
+        sum += Number(cpf[index]) * (length + 1 - index);
       }
       const remainder = (sum * 10) % 11;
       return remainder === 10 ? 0 : remainder;
@@ -97,26 +125,50 @@
       && calculateDigit(10) === Number(cpf[10]);
   }
 
-  const cpfInput = $("#cpf");
-  const phoneInput = $("#phone");
+  function isValidCNPJ(value) {
+    const cnpj = onlyDigits(value);
 
-  cpfInput.addEventListener("input", () => {
-    cpfInput.value = formatCPF(cpfInput.value);
-    clearFieldError(cpfInput);
+    if (cnpj.length !== 14 || /^(\d)\1{13}$/.test(cnpj)) return false;
+
+    const calculate = (baseLength) => {
+      const factors = baseLength === 12
+        ? [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+        : [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+
+      const sum = factors.reduce(
+        (total, factor, index) => total + Number(cnpj[index]) * factor,
+        0
+      );
+      const remainder = sum % 11;
+      return remainder < 2 ? 0 : 11 - remainder;
+    };
+
+    return calculate(12) === Number(cnpj[12])
+      && calculate(13) === Number(cnpj[13]);
+  }
+
+  $("#cpf").addEventListener("input", (event) => {
+    event.target.value = formatCPF(event.target.value);
+    clearFieldError(event.target);
   });
 
-  phoneInput.addEventListener("input", () => {
-    phoneInput.value = formatPhone(phoneInput.value);
-    clearFieldError(phoneInput);
+  $("#phone").addEventListener("input", (event) => {
+    event.target.value = formatPhone(event.target.value);
+    clearFieldError(event.target);
+  });
+
+  $("#companyDocument").addEventListener("input", (event) => {
+    event.target.value = formatDocument(event.target.value);
+    clearFieldError(event.target);
   });
 
   $$("[data-toggle-password]").forEach((button) => {
     button.addEventListener("click", () => {
       const input = document.getElementById(button.dataset.togglePassword);
-      const showing = input.type === "text";
-      input.type = showing ? "password" : "text";
-      button.textContent = showing ? "Mostrar" : "Ocultar";
-      button.setAttribute("aria-label", showing ? "Mostrar senha" : "Ocultar senha");
+      const isVisible = input.type === "text";
+      input.type = isVisible ? "password" : "text";
+      button.textContent = isVisible ? "Mostrar" : "Ocultar";
+      button.setAttribute("aria-label", isVisible ? "Mostrar senha" : "Ocultar senha");
     });
   });
 
@@ -143,16 +195,17 @@
       setFieldError(input, message);
       return false;
     }
+
     clearFieldError(input);
     return true;
   }
 
   function validateEmail(input) {
-    const basicEmailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
     if (!validateRequired(input, "Informe seu e-mail.")) return false;
 
-    if (!basicEmailPattern.test(input.value.trim())) {
+    if (!pattern.test(input.value.trim())) {
       setFieldError(input, "Digite um e-mail válido.");
       return false;
     }
@@ -161,72 +214,13 @@
     return true;
   }
 
-  $$("#loginForm input, #registerForm input").forEach((input) => {
-    input.addEventListener("input", () => clearFieldError(input));
-  });
-
-  const passwordInput = $("#password");
-  const strengthBar = $("#strengthBar");
-  const strengthText = $("#strengthText");
-
-  function passwordScore(value) {
-    let score = 0;
-    if (value.length >= 8) score += 1;
-    if (/[A-Za-z]/.test(value) && /\d/.test(value)) score += 1;
-    if (/[A-Z]/.test(value) && /[a-z]/.test(value)) score += 1;
-    if (/[^A-Za-z0-9]/.test(value)) score += 1;
-    return score;
-  }
-
-  passwordInput.addEventListener("input", () => {
-    const score = passwordScore(passwordInput.value);
-    const states = [
-      { width: "0%", color: "#a93e34", text: "Use 8 caracteres, letra e número." },
-      { width: "25%", color: "#a93e34", text: "Senha fraca." },
-      { width: "50%", color: "#bd7a2d", text: "Senha razoável." },
-      { width: "75%", color: "#4d7b3f", text: "Senha boa." },
-      { width: "100%", color: "#2f6d37", text: "Senha forte." }
-    ];
-    const current = states[score];
-
-    strengthBar.style.width = current.width;
-    strengthBar.style.backgroundColor = current.color;
-    strengthText.textContent = current.text;
-  });
-
-  $("#loginForm").addEventListener("submit", (event) => {
-    event.preventDefault();
-
-    const userInput = $("#loginUser");
-    const password = $("#loginPassword");
-    let valid = true;
-
-    if (!validateRequired(userInput, "Informe seu e-mail ou CPF.")) valid = false;
-
-    if (!validateRequired(password, "Informe sua senha.")) {
-      valid = false;
-    } else if (password.value.length < 8) {
-      setFieldError(password, "A senha deve ter pelo menos 8 caracteres.");
-      valid = false;
-    }
-
-    if (!valid) return;
-
-    showToast(
-      "Tela pronta. A autenticação real será ativada quando o banco de dados for conectado."
-    );
-  });
-
-  $("#registerForm").addEventListener("submit", (event) => {
-    event.preventDefault();
-
+  function validateStepOne() {
     const fullName = $("#fullName");
     const cpf = $("#cpf");
     const phone = $("#phone");
     const email = $("#email");
     const password = $("#password");
     const passwordConfirm = $("#passwordConfirm");
-    const terms = $("#terms");
 
     let valid = true;
 
@@ -255,8 +249,12 @@
 
     if (!validateRequired(password, "Crie uma senha.")) {
       valid = false;
-    } else if (password.value.length < 8 || !/[A-Za-z]/.test(password.value) || !/\d/.test(password.value)) {
-      setFieldError(password, "Use pelo menos 8 caracteres, incluindo letra e número.");
+    } else if (
+      password.value.length < 8
+      || !/[A-Za-z]/.test(password.value)
+      || !/\d/.test(password.value)
+    ) {
+      setFieldError(password, "Use pelo menos 8 caracteres, com letra e número.");
       valid = false;
     }
 
@@ -267,23 +265,205 @@
       valid = false;
     }
 
-    const termsError = document.querySelector('[data-error-for="terms"]');
-    if (!terms.checked) {
-      termsError.textContent = "Aceite os termos para continuar.";
+    return valid;
+  }
+
+  function validateStepTwo() {
+    const companyName = $("#companyName");
+    const companyDocument = $("#companyDocument");
+    const city = $("#city");
+    const state = $("#state");
+
+    let valid = true;
+
+    if (!validateRequired(companyName, "Informe o nome da empresa ou operação.")) {
       valid = false;
-    } else {
-      termsError.textContent = "";
+    }
+
+    if (!validateRequired(city, "Informe a cidade.")) valid = false;
+    if (!validateRequired(state, "Selecione o estado.")) valid = false;
+
+    if (companyDocument.value.trim()) {
+      const digits = onlyDigits(companyDocument.value);
+      const documentValid = digits.length === 11
+        ? isValidCPF(companyDocument.value)
+        : digits.length === 14 && isValidCNPJ(companyDocument.value);
+
+      if (!documentValid) {
+        setFieldError(companyDocument, "Digite um CPF ou CNPJ válido.");
+        valid = false;
+      }
+    }
+
+    return valid;
+  }
+
+  function validateCurrentStep() {
+    if (currentStep === 1) return validateStepOne();
+    if (currentStep === 2) return validateStepTwo();
+    return true;
+  }
+
+  function updateReview() {
+    $("#reviewName").textContent = $("#fullName").value.trim() || "—";
+    $("#reviewContact").textContent = [
+      $("#email").value.trim(),
+      $("#phone").value.trim()
+    ].filter(Boolean).join(" • ") || "—";
+
+    $("#reviewCompany").textContent = $("#companyName").value.trim() || "—";
+    $("#reviewLocation").textContent = [
+      $("#city").value.trim(),
+      $("#state").value
+    ].filter(Boolean).join(" / ") || "—";
+  }
+
+  function renderStep() {
+    formSteps.forEach((section) => {
+      const sectionStep = Number(section.dataset.step);
+      const isCurrent = sectionStep === currentStep;
+      section.classList.toggle("active", isCurrent);
+      section.hidden = !isCurrent;
+    });
+
+    stepDots.forEach((dot) => {
+      const dotStep = Number(dot.dataset.stepDot);
+      dot.classList.toggle("active", dotStep === currentStep);
+      dot.classList.toggle("done", dotStep < currentStep);
+    });
+
+    stepLabel.textContent = `Etapa ${currentStep} de 3`;
+    stepName.textContent = stepNames[currentStep];
+    stepProgress.style.width = `${(currentStep / 3) * 100}%`;
+
+    backStepButton.hidden = currentStep === 1;
+    nextStepButton.hidden = currentStep === 3;
+    submitRegistrationButton.hidden = currentStep !== 3;
+
+    if (currentStep === 3) updateReview();
+
+    const firstInput = $(
+      currentStep === 1
+        ? "#fullName"
+        : currentStep === 2
+          ? "#companyName"
+          : "#terms"
+    );
+
+    window.setTimeout(() => firstInput?.focus({ preventScroll: true }), 80);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  nextStepButton.addEventListener("click", () => {
+    if (!validateCurrentStep()) {
+      const firstInvalid = $(".input-wrap.invalid input, .input-wrap.invalid select");
+      firstInvalid?.focus();
+      return;
+    }
+
+    currentStep = Math.min(3, currentStep + 1);
+    renderStep();
+  });
+
+  backStepButton.addEventListener("click", () => {
+    currentStep = Math.max(1, currentStep - 1);
+    renderStep();
+  });
+
+  $$("#loginForm input, #registerForm input, #registerForm select").forEach((input) => {
+    input.addEventListener("input", () => clearFieldError(input));
+    input.addEventListener("change", () => clearFieldError(input));
+  });
+
+  const passwordInput = $("#password");
+  const strengthBar = $("#strengthBar");
+  const strengthText = $("#strengthText");
+
+  function passwordScore(value) {
+    let score = 0;
+    if (value.length >= 8) score += 1;
+    if (/[A-Za-z]/.test(value) && /\d/.test(value)) score += 1;
+    if (/[A-Z]/.test(value) && /[a-z]/.test(value)) score += 1;
+    if (/[^A-Za-z0-9]/.test(value)) score += 1;
+    return score;
+  }
+
+  passwordInput.addEventListener("input", () => {
+    const states = [
+      { width: "0%", color: "#a93e34", text: "Use 8 caracteres, com letra e número." },
+      { width: "25%", color: "#a93e34", text: "Senha fraca." },
+      { width: "50%", color: "#bd7a2d", text: "Senha razoável." },
+      { width: "75%", color: "#4d7b3f", text: "Senha boa." },
+      { width: "100%", color: "#2f6d37", text: "Senha forte." }
+    ];
+    const current = states[passwordScore(passwordInput.value)];
+
+    strengthBar.style.width = current.width;
+    strengthBar.style.backgroundColor = current.color;
+    strengthText.textContent = current.text;
+  });
+
+  $("#loginForm").addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const userInput = $("#loginUser");
+    const password = $("#loginPassword");
+    let valid = true;
+
+    if (!validateRequired(userInput, "Informe seu e-mail ou CPF.")) valid = false;
+
+    if (!validateRequired(password, "Informe sua senha.")) {
+      valid = false;
+    } else if (password.value.length < 8) {
+      setFieldError(password, "A senha deve ter pelo menos 8 caracteres.");
+      valid = false;
     }
 
     if (!valid) return;
 
-    showToast(
-      "Primeira etapa validada. Os dados ainda não foram enviados porque o banco de dados será conectado na próxima fase."
-    );
+    showToast("A tela está pronta. A autenticação será conectada na etapa do banco de dados.");
+  });
+
+  registerForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    if (!validateStepOne() || !validateStepTwo()) {
+      currentStep = 1;
+      renderStep();
+      showToast("Revise os campos obrigatórios antes de concluir.");
+      return;
+    }
+
+    const terms = $("#terms");
+    const termsError = document.querySelector('[data-error-for="terms"]');
+
+    if (!terms.checked) {
+      termsError.textContent = "Aceite os termos para concluir.";
+      terms.focus();
+      return;
+    }
+
+    termsError.textContent = "";
+    registrationContent.hidden = true;
+    registrationSuccess.hidden = false;
+    registrationSuccess.focus?.();
+    window.scrollTo({ top: 0, behavior: "smooth" });
   });
 
   $("#terms").addEventListener("change", () => {
     document.querySelector('[data-error-for="terms"]').textContent = "";
+  });
+
+  $("#newRegistration").addEventListener("click", () => {
+    registerForm.reset();
+    currentStep = 1;
+    registrationContent.hidden = false;
+    registrationSuccess.hidden = true;
+    strengthBar.style.width = "0%";
+    strengthText.textContent = "Use 8 caracteres, com letra e número.";
+    $$(".input-wrap.invalid").forEach((wrap) => wrap.classList.remove("invalid"));
+    $$(".field-error").forEach((error) => { error.textContent = ""; });
+    renderStep();
   });
 
   const modalContent = {
@@ -291,12 +471,12 @@
       title: "Termos de uso",
       body: `
         <p>
-          Esta é a estrutura inicial da versão 2 do Mais Castanhas. O uso definitivo
-          dependerá da conexão com autenticação, banco de dados e regras de permissão.
+          O usuário é responsável pela veracidade das informações registradas
+          e pelo uso adequado de suas credenciais de acesso.
         </p>
         <p>
-          Cada usuário será responsável pela veracidade das informações cadastradas e
-          o acesso somente será liberado após aprovação administrativa.
+          A versão definitiva terá controle de permissões, registro de alterações
+          e aprovação administrativa de novos usuários.
         </p>
       `
     },
@@ -304,8 +484,8 @@
       title: "Política de privacidade",
       body: `
         <p>
-          Os dados pessoais deverão ser utilizados exclusivamente para identificação,
-          autenticação, segurança e controle de acesso ao Mais Castanhas.
+          Os dados pessoais serão utilizados para identificação, autenticação,
+          segurança e controle de acesso ao Mais Castanhas.
         </p>
         <p>
           Nesta versão visual, nenhum dado preenchido é enviado ou armazenado.
@@ -319,12 +499,21 @@
       const content = modalContent[button.dataset.modal];
       modalTitle.textContent = content.title;
       modalBody.innerHTML = content.body;
-      infoModal.showModal();
+
+      if (typeof infoModal.showModal === "function") {
+        infoModal.showModal();
+      } else {
+        infoModal.setAttribute("open", "");
+      }
     });
   });
 
   function closeModal() {
-    if (infoModal.open) infoModal.close();
+    if (typeof infoModal.close === "function" && infoModal.open) {
+      infoModal.close();
+    } else {
+      infoModal.removeAttribute("open");
+    }
   }
 
   $(".modal-close").addEventListener("click", closeModal);
@@ -335,7 +524,7 @@
   });
 
   $("#forgotPassword").addEventListener("click", () => {
-    showToast("A recuperação de senha será conectada ao serviço de autenticação.");
+    showToast("A recuperação de senha será ativada junto com a autenticação.");
   });
 
   if ("serviceWorker" in navigator) {
@@ -345,4 +534,6 @@
       });
     });
   }
+
+  renderStep();
 })();
