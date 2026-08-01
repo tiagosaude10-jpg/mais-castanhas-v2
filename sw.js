@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mais-castanhas-v8';
+const CACHE_NAME = 'mais-castanhas-v7';
 const APP_FILES = [
   './',
   './index.html',
@@ -33,34 +33,6 @@ const VISUAL_ADJUSTMENTS = `
   .review-card,
   dialog {
     background: #ffffff !important;
-  }
-
-  .wizard-heading {
-    display: block !important;
-    margin-bottom: 18px !important;
-  }
-
-  .registration-type-select-wrap {
-    width: 100%;
-  }
-
-  .registration-type-select-wrap label {
-    display: block;
-    margin-bottom: 7px;
-    color: #344038;
-    font-size: .83rem;
-    font-weight: 760;
-  }
-
-  .registration-type-select-wrap select {
-    width: 100%;
-    min-height: 52px;
-    padding: 0 14px;
-    border: 1px solid #dfe7de;
-    border-radius: 13px;
-    color: #202820;
-    background: #ffffff;
-    font: inherit;
   }
 
   @media (max-width: 640px) {
@@ -164,51 +136,6 @@ const LOCATION_ENHANCEMENT = `
 })();
 `;
 
-const TYPE_SELECTOR_ENHANCEMENT = `
-;(() => {
-  function initializeTypeSelector() {
-    const heading = document.querySelector('.wizard-heading');
-    const wizard = document.getElementById('registrationWizard');
-    if (!heading || !wizard || heading.querySelector('#registrationTypeSelect')) return;
-
-    heading.innerHTML = ` + "`" + `
-      <div class="registration-type-select-wrap">
-        <label for="registrationTypeSelect">Tipo de cadastro</label>
-        <select id="registrationTypeSelect" aria-label="Tipo de cadastro">
-          <option value="pf">Pessoa Física</option>
-          <option value="pj">Pessoa Jurídica</option>
-        </select>
-      </div>
-    ` + "`" + `;
-
-    const select = document.getElementById('registrationTypeSelect');
-
-    function syncFromCards() {
-      const selectedCard = document.querySelector('[data-registration-type].selected');
-      if (selectedCard) select.value = selectedCard.dataset.registrationType;
-    }
-
-    select.addEventListener('change', () => {
-      const card = document.querySelector('[data-registration-type="' + select.value + '"]');
-      card?.click();
-      document.getElementById('startRegistration')?.click();
-    });
-
-    const observer = new MutationObserver(() => {
-      if (!wizard.hidden) syncFromCards();
-    });
-    observer.observe(wizard, { attributes: true, attributeFilter: ['hidden'] });
-    syncFromCards();
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeTypeSelector, { once: true });
-  } else {
-    initializeTypeSelector();
-  }
-})();
-`;
-
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_FILES)));
   self.skipWaiting();
@@ -261,7 +188,7 @@ self.addEventListener('fetch', (event) => {
       fetch(event.request, { cache: 'no-store' })
         .then((response) => response.text())
         .then((js) => {
-          const enhanced = new Response(js + '\n' + LOCATION_ENHANCEMENT + '\n' + TYPE_SELECTOR_ENHANCEMENT, {
+          const enhanced = new Response(js + '\n' + LOCATION_ENHANCEMENT, {
             headers: { 'Content-Type': 'application/javascript; charset=utf-8' }
           });
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, enhanced.clone()));
