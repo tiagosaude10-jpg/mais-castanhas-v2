@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mais-castanhas-v7';
+const CACHE_NAME = 'mais-castanhas-v9';
 const APP_FILES = [
   './',
   './index.html',
@@ -33,6 +33,45 @@ const VISUAL_ADJUSTMENTS = `
   .review-card,
   dialog {
     background: #ffffff !important;
+  }
+
+  .profile-choice {
+    padding: 16px !important;
+  }
+
+  .profile-options {
+    display: none !important;
+  }
+
+  .profile-select-wrap {
+    margin-top: 12px;
+  }
+
+  .profile-select-wrap label {
+    display: block;
+    margin-bottom: 7px;
+    color: #344038;
+    font-size: .83rem;
+    font-weight: 760;
+  }
+
+  .profile-select-wrap select {
+    width: 100%;
+    min-height: 52px;
+    padding: 0 14px;
+    border: 1px solid #dfe7de;
+    border-radius: 13px;
+    color: #202820;
+    background: #ffffff;
+    font: inherit;
+  }
+
+  .profile-select-description {
+    display: block;
+    margin-top: 8px;
+    color: #69736b;
+    font-size: .76rem;
+    line-height: 1.45;
   }
 
   @media (max-width: 640px) {
@@ -136,6 +175,72 @@ const LOCATION_ENHANCEMENT = `
 })();
 `;
 
+const PROFILE_SELECT_ENHANCEMENT = `
+;(() => {
+  function initializeProfileSelects() {
+    document.querySelectorAll('.profile-choice').forEach((choice) => {
+      if (choice.querySelector('.profile-select-wrap')) return;
+
+      const options = [...choice.querySelectorAll('.profile-option input[type="radio"]')];
+      if (!options.length) return;
+
+      const firstName = options[0].name;
+      const prefix = firstName.startsWith('pf') ? 'pf' : 'pj';
+      const descriptions = new Map();
+
+      options.forEach((radio) => {
+        const small = radio.closest('.profile-option')?.querySelector('small');
+        descriptions.set(radio.value, small?.textContent?.trim() || '');
+      });
+
+      const wrap = document.createElement('div');
+      wrap.className = 'profile-select-wrap';
+      wrap.innerHTML = ` + "`" + `
+        <label for="${prefix}ProfileSelect">Perfil solicitado</label>
+        <select id="${prefix}ProfileSelect" aria-label="Perfil solicitado">
+          <option value="">Selecione o perfil</option>
+          ${options.map((radio) => '<option value="' + radio.value + '">' + (radio.dataset.label || radio.value) + '</option>').join('')}
+        </select>
+        <small class="profile-select-description" id="${prefix}ProfileDescription"></small>
+      ` + "`" + `;
+
+      const profileOptions = choice.querySelector('.profile-options');
+      profileOptions?.insertAdjacentElement('beforebegin', wrap);
+
+      const select = wrap.querySelector('select');
+      const description = wrap.querySelector('.profile-select-description');
+
+      select.addEventListener('change', () => {
+        const selectedRadio = options.find((radio) => radio.value === select.value);
+        options.forEach((radio) => { radio.checked = radio === selectedRadio; });
+
+        if (selectedRadio) {
+          selectedRadio.dispatchEvent(new Event('change', { bubbles: true }));
+          description.textContent = descriptions.get(select.value) || '';
+        } else {
+          description.textContent = '';
+        }
+
+        const error = document.getElementById(prefix + 'ProfileError');
+        if (error) error.textContent = '';
+      });
+
+      const checked = options.find((radio) => radio.checked);
+      if (checked) {
+        select.value = checked.value;
+        description.textContent = descriptions.get(checked.value) || '';
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeProfileSelects, { once: true });
+  } else {
+    initializeProfileSelects();
+  }
+})();
+`;
+
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_FILES)));
   self.skipWaiting();
@@ -188,7 +293,7 @@ self.addEventListener('fetch', (event) => {
       fetch(event.request, { cache: 'no-store' })
         .then((response) => response.text())
         .then((js) => {
-          const enhanced = new Response(js + '\n' + LOCATION_ENHANCEMENT, {
+          const enhanced = new Response(js + '\n' + LOCATION_ENHANCEMENT + '\n' + PROFILE_SELECT_ENHANCEMENT, {
             headers: { 'Content-Type': 'application/javascript; charset=utf-8' }
           });
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, enhanced.clone()));
