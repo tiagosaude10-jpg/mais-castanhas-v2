@@ -82,7 +82,7 @@
       card.type = 'button';
       card.className = `module-card${module.inactive ? ' is-inactive' : ''}${!permitted ? ' is-locked' : ''}`;
       card.dataset.moduleId = String(module.id);
-      card.setAttribute('aria-label', `Núcleo ${module.id}: ${module.title}`);
+      card.setAttribute('aria-label', `Módulo ${module.id}: ${module.title}`);
 
       const status = module.inactive
         ? '<span class="status-badge inactive">Inativo</span>'
@@ -92,19 +92,19 @@
 
       card.innerHTML = `
         <div class="module-top"><span class="module-number">${module.id}</span>${status}</div>
-        <div><h3>Núcleo ${module.id} — ${module.title}</h3><p>${module.description}</p></div>
+        <div><h3>${module.title}</h3><p>${module.description}</p></div>
         <div class="module-footer"><span>${module.inactive ? 'Em breve' : permitted ? 'Abrir módulo' : 'Acesso restrito'}</span><span aria-hidden="true">→</span></div>`;
 
       card.addEventListener('click', () => {
         if (module.inactive) {
-          showToast('O Núcleo 12 está visível, mas permanece inativo. Nenhuma taxa está sendo cobrada.');
+          showToast('O módulo 12 está visível, mas permanece inativo. Nenhuma taxa está sendo cobrada.');
           return;
         }
         if (!permitted) {
-          showToast('Este núcleo não está liberado para o seu perfil.');
+          showToast('Este módulo não está liberado para o seu perfil.');
           return;
         }
-        openDialog('Módulo autorizado', `Núcleo ${module.id}`, `<p><strong>${module.title}</strong></p><p>A estrutura desta área será conectada na próxima etapa. O botão está funcional e o acesso foi validado para o perfil atual.</p>`);
+        openDialog('Módulo autorizado', module.title, '<p>A estrutura desta área será conectada na próxima etapa. O botão está funcional e o acesso foi validado para o perfil atual.</p>');
       });
       grid.appendChild(card);
     });
@@ -150,7 +150,7 @@
         if (destination === 'inicio') window.scrollTo({ top:0, behavior:'smooth' });
         if (destination === 'negociacoes') {
           document.querySelector('[data-module-id="3"]')?.scrollIntoView({ behavior:'smooth', block:'center' });
-          showToast('Núcleo 3 — Operações e Negociações.');
+          showToast('Operações e Negociações.');
         }
         if (destination === 'notificacoes') showToast('Você não possui novas notificações.');
         if (destination === 'perfil') {
