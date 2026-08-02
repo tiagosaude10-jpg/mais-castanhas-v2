@@ -17,9 +17,7 @@
     <img src="./logo-mais-castanhas.webp" alt="Mais Castanhas" width="220" height="165">
     <p>Carregando seu acesso...</p>
   </div>
-
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
   <div id="appShell" class="app-shell" hidden>
     <header class="topbar">
       <div class="topbar__brand">
@@ -30,68 +28,41 @@
           <small id="userRole">Perfil autorizado</small>
         </div>
       </div>
-
       <div class="topbar__actions">
-        <button id="notificationsButton" class="icon-button" type="button" aria-label="Notificações">
-          <span aria-hidden="true">🔔</span>
-        </button>
+        <button id="notificationsButton" class="icon-button" type="button" aria-label="Notificações"><span aria-hidden="true">🔔</span></button>
         <button id="logoutButton" class="logout-button" type="button">Sair</button>
       </div>
     </header>
-
     <main class="main-content">
       <section class="intro-card" aria-labelledby="screenTitle">
-        <div>
-          <p class="eyebrow">Painel principal</p>
-          <h1 id="screenTitle">Tela de Comandos</h1>
-          <p>Acesse os módulos autorizados para o seu perfil.</p>
-        </div>
+        <div><p class="eyebrow">Painel principal</p><h1 id="screenTitle">Tela de Comandos</h1><p>Acesse os módulos autorizados para o seu perfil.</p></div>
         <span id="accessBadge" class="access-badge">Acesso verificado</span>
       </section>
-
       <section aria-labelledby="modulesTitle">
         <div class="section-heading">
-          <div>
-            <p class="eyebrow">Áreas do sistema</p>
-            <h2 id="modulesTitle">Núcleos do Mais Castanhas</h2>
-          </div>
+          <div><p class="eyebrow">Áreas do sistema</p><h2 id="modulesTitle">Núcleos do Mais Castanhas</h2></div>
           <span id="moduleCount" class="module-count"></span>
         </div>
-
         <div id="modulesGrid" class="modules-grid"></div>
       </section>
     </main>
-
     <nav class="bottom-nav" aria-label="Navegação principal">
-      <button class="nav-item active" type="button" data-nav="inicio" aria-current="page">
-        <span aria-hidden="true">⌂</span><small>Início</small>
-      </button>
-      <button class="nav-item" type="button" data-nav="negociacoes">
-        <span aria-hidden="true">⇄</span><small>Negociações</small>
-      </button>
-      <button class="nav-item" type="button" data-nav="notificacoes">
-        <span aria-hidden="true">♢</span><small>Notificações</small>
-      </button>
-      <button class="nav-item" type="button" data-nav="perfil">
-        <span aria-hidden="true">○</span><small>Perfil</small>
-      </button>
-      <button class="nav-item" type="button" data-nav="mais">
-        <span aria-hidden="true">•••</span><small>Mais</small>
-      </button>
+      <button class="nav-item active" type="button" data-nav="inicio" aria-current="page"><span aria-hidden="true">⌂</span><small>Início</small></button>
+      <button class="nav-item" type="button" data-nav="negociacoes"><span aria-hidden="true">⇄</span><small>Negociações</small></button>
+      <button class="nav-item" type="button" data-nav="notificacoes"><span aria-hidden="true">♢</span><small>Notificações</small></button>
+      <button class="nav-item" type="button" data-nav="perfil"><span aria-hidden="true">○</span><small>Perfil</small></button>
+      <button class="nav-item" type="button" data-nav="mais"><span aria-hidden="true">•••</span><small>Mais</small></button>
     </nav>
   </div>
-
   <dialog id="infoDialog">
     <div class="dialog-card">
       <button id="closeDialog" class="dialog-close" type="button" aria-label="Fechar">×</button>
-      <p id="dialogEyebrow" class="eyebrow"></p>
-      <h2 id="dialogTitle"></h2>
-      <div id="dialogBody"></div>
+      <p id="dialogEyebrow" class="eyebrow"></p><h2 id="dialogTitle"></h2><div id="dialogBody"></div>
       <button id="dialogOk" class="primary-button" type="button">Entendi</button>
     </div>
   </dialog>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
   <script src="./dashboard.js?v=3" defer></script>
+  <script src="./module1-link.js?v=1" defer></script>
 </body>
 </html>
