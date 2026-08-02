@@ -3,6 +3,7 @@
 
   const SUPABASE_URL = 'https://otopgejrkngurroucmxd.supabase.co';
   const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ZkolpArGVOpzVY76dsIt7w_vA1Ym2R9';
+  const DASHBOARD_URL = './dashboard.html';
   const $ = (selector) => document.querySelector(selector);
   const value = (selector) => $(selector)?.value?.trim() || '';
 
@@ -30,6 +31,33 @@
 
   function selectedProfile(prefix) {
     return document.querySelector(`input[name="${prefix}RequestedProfile"]:checked`)?.value || '';
+  }
+
+  function isRecoveryReturn() {
+    const query = new URLSearchParams(location.search);
+    const hash = new URLSearchParams(location.hash.replace(/^#/, ''));
+    return query.get('recovery') === '1'
+      || query.get('type') === 'recovery'
+      || hash.get('type') === 'recovery'
+      || Boolean(query.get('code'))
+      || Boolean(hash.get('access_token') && hash.get('refresh_token'));
+  }
+
+  async function getApprovedProfile(userId) {
+    const { data: profile, error } = await client
+      .from('profiles')
+      .select('full_name, approved_profile, approval_status, is_platform_admin')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!profile || profile.approval_status !== 'aprovado') return null;
+    return profile;
+  }
+
+  function openDashboard(profile) {
+    localStorage.setItem('maisCastanhas.currentProfile', JSON.stringify(profile));
+    location.replace(DASHBOARD_URL);
   }
 
   function registrationData() {
@@ -97,29 +125,48 @@
 
     const button = $('#loginForm button[type="submit"]');
     const original = button?.textContent;
-    if (button) { button.disabled = true; button.textContent = 'Entrando...'; }
+    if (button) {
+      button.disabled = true;
+      button.textContent = 'Entrando...';
+    }
 
     try {
       const { data, error } = await client.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      const { data: profile, error: profileError } = await client
-        .from('profiles')
-        .select('full_name, approved_profile, approval_status, is_platform_admin')
-        .eq('id', data.user.id)
-        .maybeSingle();
-      if (profileError) throw profileError;
-      if (!profile || profile.approval_status !== 'aprovado') {
+
+      const profile = await getApprovedProfile(data.user.id);
+      if (!profile) {
         await client.auth.signOut();
         return showToast('Seu cadastro ainda não foi aprovado pelo administrador.');
       }
-      localStorage.setItem('maisCastanhas.currentProfile', JSON.stringify(profile));
-      showToast(`Acesso autorizado. Bem-vindo, ${profile.full_name || 'usuário'}.`);
+
       document.dispatchEvent(new CustomEvent('maiscastanhas:login-success', { detail: profile }));
+      openDashboard(profile);
     } catch (error) {
       const invalid = String(error?.message || '').toLowerCase().includes('invalid login');
       showToast(invalid ? 'E-mail ou senha incorretos.' : `Não foi possível entrar: ${error.message || 'erro desconhecido'}`);
     } finally {
-      if (button) { button.disabled = false; button.textContent = original; }
+      if (button && location.pathname.endsWith('index.html')) {
+        button.disabled = false;
+        button.textContent = original;
+      }
+    }
+  }
+
+  async function restoreApprovedSession() {
+    if (isRecoveryReturn()) return;
+    try {
+      const { data, error } = await client.auth.getSession();
+      if (error || !data.session?.user) return;
+      const profile = await getApprovedProfile(data.session.user.id);
+      if (!profile) {
+        await client.auth.signOut();
+        localStorage.removeItem('maisCastanhas.currentProfile');
+        return;
+      }
+      openDashboard(profile);
+    } catch (error) {
+      console.error('Não foi possível restaurar a sessão:', error);
     }
   }
 
@@ -198,7 +245,8 @@
     const refreshToken = hash.get('refresh_token');
     const looksLikeRecovery = marker || type === 'recovery' || Boolean(code) || Boolean(accessToken && refreshToken);
 
-    if (looksLikeRecovery) showPasswordResetScreen('Validando o link de recuperação...');
+    if (!looksLikeRecovery) return;
+    showPasswordResetScreen('Validando o link de recuperação...');
 
     try {
       if (code) {
@@ -210,12 +258,11 @@
       }
 
       const { data } = await client.auth.getSession();
-      if (data.session && looksLikeRecovery) {
-        const message = $('#passwordResetMessage');
+      const message = $('#passwordResetMessage');
+      if (data.session) {
         if (message) message.textContent = '';
-      } else if (looksLikeRecovery) {
-        const message = $('#passwordResetMessage');
-        if (message) message.textContent = 'O link não criou uma sessão válida. Solicite um novo e-mail de recuperação.';
+      } else if (message) {
+        message.textContent = 'O link não criou uma sessão válida. Solicite um novo e-mail de recuperação.';
       }
     } catch (error) {
       const message = $('#passwordResetMessage');
@@ -229,26 +276,33 @@
     form.addEventListener('submit', async () => {
       const finish = $('#finishRegistration');
       const original = finish?.textContent;
-      if (finish) { finish.disabled = true; finish.textContent = 'Enviando...'; }
+      if (finish) {
+        finish.disabled = true;
+        finish.textContent = 'Enviando...';
+      }
       try {
         const data = await createRegistration();
         showToast(data.session ? 'Cadastro enviado para análise administrativa.' : 'Cadastro criado. Confirme o e-mail.');
       } catch (error) {
         showToast(`O cadastro não foi enviado: ${error.message || 'erro desconhecido'}`);
       } finally {
-        if (finish) { finish.disabled = false; finish.textContent = original; }
+        if (finish) {
+          finish.disabled = false;
+          finish.textContent = original;
+        }
       }
     });
   }
 
-  function init() {
-    processRecoveryReturn();
+  async function init() {
+    await processRecoveryReturn();
     client.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') showPasswordResetScreen();
     });
     $('#loginForm')?.addEventListener('submit', handleLogin, true);
     $('#forgotPassword')?.addEventListener('click', handleRecovery, true);
     bindRegistration();
+    await restoreApprovedSession();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
