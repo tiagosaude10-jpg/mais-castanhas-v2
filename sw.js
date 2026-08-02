@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mais-castanhas-v19';
+const CACHE_NAME = 'mais-castanhas-v20';
 const STATIC_FILES = [
   './manifest.webmanifest',
   './logo-mais-castanhas.webp',
