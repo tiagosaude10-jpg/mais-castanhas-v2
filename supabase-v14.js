@@ -21,11 +21,7 @@
   }
 
   const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true
-    }
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
   });
   window.maisCastanhasSupabase = client;
 
@@ -33,26 +29,28 @@
     return document.querySelector(`input[name="${prefix}RequestedProfile"]:checked`)?.value || '';
   }
 
-  function isRecoveryReturn() {
+  function recoveryParameters() {
     const query = new URLSearchParams(location.search);
     const hash = new URLSearchParams(location.hash.replace(/^#/, ''));
-    return query.get('recovery') === '1'
+    const code = query.get('code');
+    const accessToken = hash.get('access_token');
+    const refreshToken = hash.get('refresh_token');
+    const active = query.get('recovery') === '1'
       || query.get('type') === 'recovery'
       || hash.get('type') === 'recovery'
-      || Boolean(query.get('code'))
-      || Boolean(hash.get('access_token') && hash.get('refresh_token'));
+      || Boolean(code)
+      || Boolean(accessToken && refreshToken);
+    return { active, code, accessToken, refreshToken };
   }
 
   async function getApprovedProfile(userId) {
-    const { data: profile, error } = await client
+    const { data, error } = await client
       .from('profiles')
       .select('full_name, approved_profile, approval_status, is_platform_admin')
       .eq('id', userId)
       .maybeSingle();
-
     if (error) throw error;
-    if (!profile || profile.approval_status !== 'aprovado') return null;
-    return profile;
+    return data?.approval_status === 'aprovado' ? data : null;
   }
 
   function openDashboard(profile) {
@@ -105,11 +103,13 @@
     if (!payload.email || !payload.password || !payload.metadata.requested_profile) {
       throw new Error('Preencha e revise os dados do cadastro antes de concluir.');
     }
-    const redirectTo = `${location.origin}${location.pathname}`;
     const { data, error } = await client.auth.signUp({
       email: payload.email,
       password: payload.password,
-      options: { emailRedirectTo: redirectTo, data: payload.metadata }
+      options: {
+        emailRedirectTo: `${location.origin}${location.pathname}`,
+        data: payload.metadata
+      }
     });
     if (error) throw error;
     return data;
@@ -118,13 +118,14 @@
   async function handleLogin(event) {
     event.preventDefault();
     event.stopImmediatePropagation();
+
     const email = value('#loginUser');
     const password = value('#loginPassword');
     if (!email.includes('@')) return showToast('Entre usando o e-mail cadastrado.');
     if (!password) return showToast('Informe sua senha.');
 
     const button = $('#loginForm button[type="submit"]');
-    const original = button?.textContent;
+    const original = button?.textContent || 'Entrar no aplicativo';
     if (button) {
       button.disabled = true;
       button.textContent = 'Entrando...';
@@ -137,7 +138,8 @@
       const profile = await getApprovedProfile(data.user.id);
       if (!profile) {
         await client.auth.signOut();
-        return showToast('Seu cadastro ainda não foi aprovado pelo administrador.');
+        showToast('Seu cadastro ainda não foi aprovado pelo administrador.');
+        return;
       }
 
       document.dispatchEvent(new CustomEvent('maiscastanhas:login-success', { detail: profile }));
@@ -146,7 +148,7 @@
       const invalid = String(error?.message || '').toLowerCase().includes('invalid login');
       showToast(invalid ? 'E-mail ou senha incorretos.' : `Não foi possível entrar: ${error.message || 'erro desconhecido'}`);
     } finally {
-      if (button && location.pathname.endsWith('index.html')) {
+      if (button && document.contains(button)) {
         button.disabled = false;
         button.textContent = original;
       }
@@ -154,7 +156,7 @@
   }
 
   async function restoreApprovedSession() {
-    if (isRecoveryReturn()) return;
+    if (recoveryParameters().active) return;
     try {
       const { data, error } = await client.auth.getSession();
       if (error || !data.session?.user) return;
@@ -177,8 +179,9 @@
     const email = current.includes('@') ? current : prompt('Digite o e-mail cadastrado:');
     if (!email) return;
     try {
-      const redirectTo = `${location.origin}${location.pathname}?recovery=1`;
-      const { error } = await client.auth.resetPasswordForEmail(email.trim(), { redirectTo });
+      const { error } = await client.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${location.origin}${location.pathname}?recovery=1`
+      });
       if (error) throw error;
       showToast('Enviamos as instruções de recuperação para o e-mail informado.');
     } catch (error) {
@@ -224,6 +227,7 @@
         button.textContent = 'Salvar nova senha';
         return;
       }
+
       message.style.color = '#2f6535';
       message.textContent = 'Senha alterada com sucesso.';
       setTimeout(async () => {
@@ -236,24 +240,19 @@
   }
 
   async function processRecoveryReturn() {
-    const query = new URLSearchParams(location.search);
-    const hash = new URLSearchParams(location.hash.replace(/^#/, ''));
-    const code = query.get('code');
-    const marker = query.get('recovery') === '1';
-    const type = query.get('type') || hash.get('type');
-    const accessToken = hash.get('access_token');
-    const refreshToken = hash.get('refresh_token');
-    const looksLikeRecovery = marker || type === 'recovery' || Boolean(code) || Boolean(accessToken && refreshToken);
-
-    if (!looksLikeRecovery) return;
+    const recovery = recoveryParameters();
+    if (!recovery.active) return;
     showPasswordResetScreen('Validando o link de recuperação...');
 
     try {
-      if (code) {
-        const { error } = await client.auth.exchangeCodeForSession(code);
+      if (recovery.code) {
+        const { error } = await client.auth.exchangeCodeForSession(recovery.code);
         if (error) throw error;
-      } else if (accessToken && refreshToken) {
-        const { error } = await client.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+      } else if (recovery.accessToken && recovery.refreshToken) {
+        const { error } = await client.auth.setSession({
+          access_token: recovery.accessToken,
+          refresh_token: recovery.refreshToken
+        });
         if (error) throw error;
       }
 
@@ -275,7 +274,7 @@
     if (!form) return;
     form.addEventListener('submit', async () => {
       const finish = $('#finishRegistration');
-      const original = finish?.textContent;
+      const original = finish?.textContent || 'Concluir cadastro';
       if (finish) {
         finish.disabled = true;
         finish.textContent = 'Enviando...';
@@ -286,7 +285,7 @@
       } catch (error) {
         showToast(`O cadastro não foi enviado: ${error.message || 'erro desconhecido'}`);
       } finally {
-        if (finish) {
+        if (finish && document.contains(finish)) {
           finish.disabled = false;
           finish.textContent = original;
         }
@@ -305,6 +304,9 @@
     await restoreApprovedSession();
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
-  else init();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
 })();
