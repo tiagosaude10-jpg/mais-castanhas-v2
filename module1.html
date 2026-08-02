@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#24552a">
+  <title>Mais Castanhas — Compras e Fornecedores</title>
+  <link rel="stylesheet" href="./module1.css?v=1">
+</head>
+<body>
+  <div id="loading" class="loading">Carregando Compras e Fornecedores...</div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <div id="app" hidden>
+    <header class="topbar">
+      <button id="backButton" class="back-button" type="button">← Voltar</button>
+      <div>
+        <small>Módulo 1</small>
+        <h1>Compras e Fornecedores</h1>
+      </div>
+      <button id="logoutButton" class="logout-button" type="button">Sair</button>
+    </header>
+
+    <main class="content">
+      <section class="summary-grid" aria-label="Resumo do módulo">
+        <article><span>Fornecedores ativos</span><strong id="supplierCount">0</strong></article>
+        <article><span>Compras registradas</span><strong id="purchaseCount">0</strong></article>
+        <article><span>Total comprado</span><strong id="purchaseTotal">R$ 0,00</strong></article>
+        <article><span>Saldo a pagar</span><strong id="balanceTotal">R$ 0,00</strong></article>
+      </section>
+
+      <nav class="tabs" aria-label="Áreas do módulo">
+        <button class="tab active" data-tab="purchases" type="button">Compras</button>
+        <button class="tab" data-tab="suppliers" type="button">Fornecedores</button>
+      </nav>
+
+      <section id="purchasesPanel" class="panel active">
+        <div class="panel-heading">
+          <div><small>Controle comercial</small><h2>Compras de castanha</h2></div>
+          <button id="newPurchaseButton" class="primary" type="button">+ Nova compra</button>
+        </div>
+        <div class="toolbar"><input id="purchaseSearch" type="search" placeholder="Pesquisar fornecedor ou local de origem"></div>
+        <div id="purchaseList" class="list"></div>
+      </section>
+
+      <section id="suppliersPanel" class="panel">
+        <div class="panel-heading">
+          <div><small>Base de parceiros</small><h2>Fornecedores</h2></div>
+          <button id="newSupplierButton" class="primary" type="button">+ Novo fornecedor</button>
+        </div>
+        <div class="toolbar"><input id="supplierSearch" type="search" placeholder="Pesquisar nome, documento ou cidade"></div>
+        <div id="supplierList" class="list"></div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="supplierDialog">
+    <form id="supplierForm" class="dialog-card">
+      <button class="close" type="button" data-close="supplierDialog">×</button>
+      <small>Cadastro</small><h2>Fornecedor</h2>
+      <input id="supplierId" type="hidden">
+      <label>Tipo<select id="supplierType"><option value="pessoa_fisica">Pessoa física</option><option value="pessoa_juridica">Pessoa jurídica</option></select></label>
+      <label>Nome completo ou razão social<input id="supplierName" required></label>
+      <div class="form-grid"><label>CPF ou CNPJ<input id="supplierDocument"></label><label>Telefone<input id="supplierPhone" inputmode="tel"></label></div>
+      <label>E-mail<input id="supplierEmail" type="email"></label>
+      <div class="form-grid"><label>Cidade<input id="supplierCity"></label><label>Estado<input id="supplierState" maxlength="2"></label></div>
+      <label>Comunidade ou origem<input id="supplierOrigin"></label>
+      <label>Observações<textarea id="supplierNotes" rows="3"></textarea></label>
+      <button class="primary full" type="submit">Salvar fornecedor</button>
+    </form>
+  </dialog>
+
+  <dialog id="purchaseDialog">
+    <form id="purchaseForm" class="dialog-card">
+      <button class="close" type="button" data-close="purchaseDialog">×</button>
+      <small>Registro comercial</small><h2>Compra de castanha</h2>
+      <input id="purchaseId" type="hidden">
+      <label>Fornecedor<select id="purchaseSupplier" required></select></label>
+      <div class="form-grid"><label>Data<input id="purchaseDate" type="date" required></label><label>Quantidade (kg)<input id="purchaseQuantity" type="number" min="0.001" step="0.001" required></label></div>
+      <div class="form-grid"><label>Forma do preço<select id="priceMode"><option value="fechado">Preço fechado</option><option value="aberto">Preço aberto</option></select></label><label id="unitPriceLabel">Preço por kg<input id="unitPrice" type="number" min="0" step="0.01"></label></div>
+      <label id="estimatedPriceLabel" hidden>Preço estimado por kg<input id="estimatedUnitPrice" type="number" min="0" step="0.01"></label>
+      <div class="form-grid"><label>Situação<select id="purchaseStatus"><option value="negociacao">Em negociação</option><option value="confirmada" selected>Confirmada</option><option value="recebida">Recebida</option><option value="rascunho">Rascunho</option><option value="cancelada">Cancelada</option></select></label><label>Previsão de entrega<input id="expectedDelivery" type="date"></label></div>
+      <label>Origem da castanha<input id="originLocation"></label>
+      <label>Classificação de qualidade<input id="qualityClassification"></label>
+      <label>Observações<textarea id="purchaseNotes" rows="3"></textarea></label>
+      <div class="calculation"><span>Valor calculado</span><strong id="calculatedTotal">R$ 0,00</strong></div>
+      <button class="primary full" type="submit">Salvar compra</button>
+    </form>
+  </dialog>
+
+  <dialog id="paymentDialog">
+    <form id="paymentForm" class="dialog-card">
+      <button class="close" type="button" data-close="paymentDialog">×</button>
+      <small>Financeiro da compra</small><h2>Registrar pagamento</h2>
+      <input id="paymentPurchaseId" type="hidden">
+      <label>Data<input id="paymentDate" type="date" required></label>
+      <label>Valor pago<input id="paymentAmount" type="number" min="0.01" step="0.01" required></label>
+      <label>Forma de pagamento<input id="paymentMethod" placeholder="Pix, transferência, dinheiro..."></label>
+      <label>Referência ou comprovante<input id="paymentReference"></label>
+      <label>Observações<textarea id="paymentNotes" rows="3"></textarea></label>
+      <button class="primary full" type="submit">Registrar pagamento</button>
+    </form>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="./module1.js?v=1" defer></script>
+</body>
+</html>
