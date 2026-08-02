@@ -1,11 +1,14 @@
-const CACHE_NAME = 'mais-castanhas-v12';
+const CACHE_NAME = 'mais-castanhas-v17';
 const STATIC_FILES = [
   './manifest.webmanifest',
   './logo-mais-castanhas.webp',
   './icon-192.png',
   './icon-512.png',
   './apple-touch-icon.png',
-  './favicon-32.png'
+  './favicon-32.png',
+  './dashboard.html',
+  './dashboard.css',
+  './dashboard.js'
 ];
 
 self.addEventListener('install', (event) => {
