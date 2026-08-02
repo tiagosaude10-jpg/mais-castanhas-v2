@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mais-castanhas-v17';
+const CACHE_NAME = 'mais-castanhas-v18';
 const STATIC_FILES = [
   './manifest.webmanifest',
   './logo-mais-castanhas.webp',
@@ -31,7 +31,7 @@ self.addEventListener('fetch', (event) => {
 
   if (event.request.mode === 'navigate' || url.pathname.endsWith('.js') || url.pathname.endsWith('.css')) {
     event.respondWith(
-      fetch(event.request, { cache:'no-store' }).catch(() => caches.match(event.request))
+      fetch(event.request, { cache: 'no-store' }).catch(() => caches.match(event.request))
     );
     return;
   }
