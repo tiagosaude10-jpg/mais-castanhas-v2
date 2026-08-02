@@ -16,7 +16,7 @@
     { id:9, title:'Relatórios e Inteligência Gerencial', description:'Indicadores, dashboards, comparativos, tendências e análises gerenciais.' },
     { id:10, title:'Documentos, Contratos e Conformidade', description:'Contratos, notas, recibos, certificados, laudos e histórico documental.' },
     { id:11, title:'Usuários, Perfis e Permissões', description:'Usuários, acessos, perfis, permissões, auditoria e segurança.' },
-    { id:12, title:'Administração da Plataforma e Taxas', description:'Administração geral e futura taxa de 0,5% sobre operações efetivadas.', inactive:true }
+    { id:12, title:'Administração da Plataforma e Taxas', description:'Administração geral e futura taxa de 1% sobre as operações efetivadas no aplicativo.', inactive:true }
   ];
 
   const PROFILE_MODULES = {
@@ -97,7 +97,7 @@
 
       card.addEventListener('click', () => {
         if (module.inactive) {
-          showToast('O módulo 12 está visível, mas permanece inativo. Nenhuma taxa está sendo cobrada.');
+          showToast('O módulo 12 está visível, mas permanece inativo. A taxa futura registrada é de 1% sobre operações efetivadas no aplicativo, sem cobrança neste momento.');
           return;
         }
         if (!permitted) {
